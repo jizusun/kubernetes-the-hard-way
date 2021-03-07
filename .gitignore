@@ -51,3 +51,8 @@ service-account-csr.json
 ubuntu-bionic*.log
 .vagrant
 temp
+
+certs
+.DS_Store
+ssh_config
+vagrant/*.sh
