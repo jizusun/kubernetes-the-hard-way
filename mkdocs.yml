@@ -1,3 +1,4 @@
 site_name: Kubernetes the Hard way
+repo_url: https://github.com/jizusun/kubernetes-the-hard-way
 theme:
   name: material
