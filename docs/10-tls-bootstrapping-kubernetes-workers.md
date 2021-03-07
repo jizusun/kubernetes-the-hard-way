@@ -18,11 +18,11 @@ This is not a practical approach when you have 1000s of nodes in the cluster, an
 
 So let's get started!
 
-# What is required for TLS Bootstrapping
+## What is required for TLS Bootstrapping
 
 **Certificates API:** The Certificate API (as discussed in the lecture) provides a set of APIs on Kubernetes that can help us manage certificates (Create CSR, Get them signed by CA, Retrieve signed certificate etc). The worker nodes (kubelets) have the ability to use this API to get certificates signed by the Kubernetes CA.
 
-# Pre-Requisite
+## Pre-Requisite
 
 **kube-apiserver** - Ensure bootstrap token based authentication is enabled on the kube-apiserver.
 
@@ -80,7 +80,7 @@ Install the worker binaries:
 
 `sudo mv ca.crt /var/lib/kubernetes/`
 
-# Step 1 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API
+## Step 1 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API
 
 For the workers(kubelet) to access the Certificates API, they need to authenticate to the kubernetes api-server first. For this we create a [Bootstrap Token](https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/) to be used by the kubelet
 
