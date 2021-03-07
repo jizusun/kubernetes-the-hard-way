@@ -26,8 +26,14 @@ jobs:
             ${{ runner.os }}-
       - run: pip install mkdocs-material
       - run: |
-          git branch -a
-          git log gh-pages
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git branch -a
+
+          git branch -D gh-pages
+          git checkout gh-pages
+          git pull --rebase
+          git checkout master
+          mkdocs build --clean
+
       - run: mkdocs gh-deploy 
