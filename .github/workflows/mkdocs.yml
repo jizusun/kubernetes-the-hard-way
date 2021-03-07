@@ -14,23 +14,12 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          # This path is specific to Ubuntu
-          path: ~/.cache/pip
-          # Look to see if there is a cache hit for the corresponding requirements file
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-
       - run: pip install mkdocs-material
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git branch -a
 
-          git branch -D gh-pages
           git checkout gh-pages
           git pull --rebase
           git checkout master
