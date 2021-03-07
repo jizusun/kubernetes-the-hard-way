@@ -289,9 +289,149 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        10. TLS Bootstrapping Worker Nodes
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
     <a href="./" class="md-nav__link md-nav__link--active">
       10. TLS Bootstrapping Worker Nodes
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-required-for-tls-bootstrapping" class="md-nav__link">
+    What is required for TLS Bootstrapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pre-requisite" class="md-nav__link">
+    Pre-Requisite
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-configure-the-binaries-on-the-worker-node" class="md-nav__link">
+    Step 1 Configure the Binaries on the Worker node
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1 Configure the Binaries on the Worker node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-and-install-worker-binaries" class="md-nav__link">
+    Download and Install Worker Binaries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#move-the-ca-certificate" class="md-nav__link">
+    Move the ca certificate
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api" class="md-nav__link">
+    Step 1 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-authorize-workerskubelets-to-create-csr" class="md-nav__link">
+    Step 2 Authorize workers(kubelets) to create CSR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-authorize-workerskubelets-to-approve-csr" class="md-nav__link">
+    Step 3 Authorize workers(kubelets) to approve CSR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-authorize-workerskubelets-to-auto-renew-certificates-on-expiration" class="md-nav__link">
+    Step 3 Authorize workers(kubelets) to Auto Renew Certificates on expiration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-configure-kubelet-to-tls-bootstrap" class="md-nav__link">
+    Step 4 Configure Kubelet to TLS Bootstrap
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-create-kubelet-config-file" class="md-nav__link">
+    Step 5 Create Kubelet Config File
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-configure-kubelet-service" class="md-nav__link">
+    Step 6 Configure Kubelet Service
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-configure-the-kubernetes-proxy" class="md-nav__link">
+    Step 7 Configure the Kubernetes Proxy
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-start-the-worker-services" class="md-nav__link">
+    Step 8 Start the Worker Services
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-9-approve-server-csr" class="md-nav__link">
+    Step 9 Approve Server CSR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    Verification
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -421,6 +561,132 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-required-for-tls-bootstrapping" class="md-nav__link">
+    What is required for TLS Bootstrapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pre-requisite" class="md-nav__link">
+    Pre-Requisite
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-configure-the-binaries-on-the-worker-node" class="md-nav__link">
+    Step 1 Configure the Binaries on the Worker node
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1 Configure the Binaries on the Worker node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-and-install-worker-binaries" class="md-nav__link">
+    Download and Install Worker Binaries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#move-the-ca-certificate" class="md-nav__link">
+    Move the ca certificate
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api" class="md-nav__link">
+    Step 1 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-authorize-workerskubelets-to-create-csr" class="md-nav__link">
+    Step 2 Authorize workers(kubelets) to create CSR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-authorize-workerskubelets-to-approve-csr" class="md-nav__link">
+    Step 3 Authorize workers(kubelets) to approve CSR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-authorize-workerskubelets-to-auto-renew-certificates-on-expiration" class="md-nav__link">
+    Step 3 Authorize workers(kubelets) to Auto Renew Certificates on expiration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-configure-kubelet-to-tls-bootstrap" class="md-nav__link">
+    Step 4 Configure Kubelet to TLS Bootstrap
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-create-kubelet-config-file" class="md-nav__link">
+    Step 5 Create Kubelet Config File
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-configure-kubelet-service" class="md-nav__link">
+    Step 6 Configure Kubelet Service
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-configure-the-kubernetes-proxy" class="md-nav__link">
+    Step 7 Configure the Kubernetes Proxy
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-start-the-worker-services" class="md-nav__link">
+    Step 8 Start the Worker Services
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-9-approve-server-csr" class="md-nav__link">
+    Step 9 Approve Server CSR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    Verification
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -449,9 +715,9 @@
 <li>The Nodes can renew certificates when they expire by themselves</li>
 </ul>
 <p>So let's get started!</p>
-<h1 id="what-is-required-for-tls-bootstrapping">What is required for TLS Bootstrapping</h1>
+<h2 id="what-is-required-for-tls-bootstrapping">What is required for TLS Bootstrapping</h2>
 <p><strong>Certificates API:</strong> The Certificate API (as discussed in the lecture) provides a set of APIs on Kubernetes that can help us manage certificates (Create CSR, Get them signed by CA, Retrieve signed certificate etc). The worker nodes (kubelets) have the ability to use this API to get certificates signed by the Kubernetes CA.</p>
-<h1 id="pre-requisite">Pre-Requisite</h1>
+<h2 id="pre-requisite">Pre-Requisite</h2>
 <p><strong>kube-apiserver</strong> - Ensure bootstrap token based authentication is enabled on the kube-apiserver.</p>
 <p><code>--enable-bootstrap-token-auth=true</code></p>
 <p><strong>kube-controller-manager</strong> - The certificate requests are signed by the kube-controller-manager ultimately. The kube-controller-manager requires the CA Certificate and Key to perform these operations.</p>
@@ -489,7 +755,7 @@
 </code></pre>
 <h3 id="move-the-ca-certificate">Move the ca certificate</h3>
 <p><code>sudo mv ca.crt /var/lib/kubernetes/</code></p>
-<h1 id="step-1-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api">Step 1 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API</h1>
+<h2 id="step-1-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api">Step 1 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API</h2>
 <p>For the workers(kubelet) to access the Certificates API, they need to authenticate to the kubernetes api-server first. For this we create a <a href="https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/">Bootstrap Token</a> to be used by the kubelet</p>
 <p>Bootstrap Tokens take the form of a 6 character token id followed by 16 character token secret separated by a dot. Eg: abcdef.0123456789abcdef. More formally, they must match the regular expression [a-z0-9]{6}.[a-z0-9]{16}</p>
 <p>Bootstrap Tokens are created as a secret in the kube-system namespace.</p>
