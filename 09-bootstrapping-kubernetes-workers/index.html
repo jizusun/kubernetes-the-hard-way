@@ -1,0 +1,954 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+    
+    
+      
+        <title>9. Bootstrapping the Kubernetes Worker Nodes - Kubernetes the Hard way</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.77f3fd56.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.7fa14f5b.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#9-bootstrapping-the-kubernetes-worker-nodes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Kubernetes the Hard way" class="md-header__button md-logo" aria-label="Kubernetes the Hard way">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Kubernetes the Hard way
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              9. Bootstrapping the Kubernetes Worker Nodes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="md-header__options">
+      
+    </div>
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Kubernetes the Hard way" class="md-nav__button md-logo" aria-label="Kubernetes the Hard way">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    Kubernetes the Hard way
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Welcome to MkDocs
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-prerequisites/" class="md-nav__link">
+        1. Prerequisites
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-compute-resources/" class="md-nav__link">
+        2. Provisioning Compute Resources
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-client-tools/" class="md-nav__link">
+        3. Installing the Client Tools
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-certificate-authority/" class="md-nav__link">
+        4. Provisioning a CA and Generating TLS Certificates
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-kubernetes-configuration-files/" class="md-nav__link">
+        5. Generating Kubernetes Configuration Files for Authentication
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-data-encryption-keys/" class="md-nav__link">
+        6. Generating the Data Encryption Config and Key
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-bootstrapping-etcd/" class="md-nav__link">
+        7. Bootstrapping the etcd Cluster
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-bootstrapping-kubernetes-controllers/" class="md-nav__link">
+        8. Bootstrapping the Kubernetes Control Plane
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          9. Bootstrapping the Kubernetes Worker Nodes
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        9. Bootstrapping the Kubernetes Worker Nodes
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    Prerequisites
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#provisioning-kubelet-client-certificates" class="md-nav__link">
+    Provisioning  Kubelet Client Certificates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-kubelet-kubernetes-configuration-file" class="md-nav__link">
+    The kubelet Kubernetes Configuration File
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copy-certificates-private-keys-and-kubeconfig-files-to-the-worker-node" class="md-nav__link">
+    Copy certificates, private keys and kubeconfig files to the worker node:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download-and-install-worker-binaries" class="md-nav__link">
+    Download and Install Worker Binaries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-the-kubelet" class="md-nav__link">
+    Configure the Kubelet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-the-kubernetes-proxy" class="md-nav__link">
+    Configure the Kubernetes Proxy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-the-worker-services" class="md-nav__link">
+    Start the Worker Services
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    Verification
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-tls-bootstrapping-kubernetes-workers/" class="md-nav__link">
+        10. TLS Bootstrapping Worker Nodes
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-configuring-kubectl/" class="md-nav__link">
+        11. Configuring kubectl for Remote Access
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-configure-pod-networking/" class="md-nav__link">
+        12. Provisioning Pod Network
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13-kube-apiserver-to-kubelet/" class="md-nav__link">
+        13. Kubernetes API server to Kubelet
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../14-dns-addon/" class="md-nav__link">
+        14. Deploying the DNS Cluster Add-on
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../15-smoke-test/" class="md-nav__link">
+        15. Smoke Test
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../16-e2e-tests/" class="md-nav__link">
+        16. Run End-to-End Tests
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../17-extra-dynamic-kubelet-configuration/" class="md-nav__link">
+        17. Dynamic Kubelet Configuration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../differences-to-original/" class="md-nav__link">
+        Differences between original and this solution
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../verify-certificates/" class="md-nav__link">
+        Verify Certificates in Master-1/2 & Worker-1
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    Prerequisites
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#provisioning-kubelet-client-certificates" class="md-nav__link">
+    Provisioning  Kubelet Client Certificates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-kubelet-kubernetes-configuration-file" class="md-nav__link">
+    The kubelet Kubernetes Configuration File
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copy-certificates-private-keys-and-kubeconfig-files-to-the-worker-node" class="md-nav__link">
+    Copy certificates, private keys and kubeconfig files to the worker node:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download-and-install-worker-binaries" class="md-nav__link">
+    Download and Install Worker Binaries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-the-kubelet" class="md-nav__link">
+    Configure the Kubelet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-the-kubernetes-proxy" class="md-nav__link">
+    Configure the Kubernetes Proxy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-the-worker-services" class="md-nav__link">
+    Start the Worker Services
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    Verification
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="9-bootstrapping-the-kubernetes-worker-nodes">9. Bootstrapping the Kubernetes Worker Nodes</h1>
+<p>In this lab you will bootstrap 2 Kubernetes worker nodes. We already have <a href="https://www.docker.com">Docker</a> installed on these nodes.</p>
+<p>We will now install the kubernetes components
+- <a href="https://kubernetes.io/docs/admin/kubelet">kubelet</a>
+- <a href="https://kubernetes.io/docs/concepts/cluster-administration/proxies">kube-proxy</a>.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>The Certificates and Configuration are created on <code>master-1</code> node and then copied over to workers using <code>scp</code>. 
+Once this is done, the commands are to be run on first worker instance: <code>worker-1</code>. Login to first worker instance using SSH Terminal.</p>
+<h3 id="provisioning-kubelet-client-certificates">Provisioning  Kubelet Client Certificates</h3>
+<p>Kubernetes uses a <a href="https://kubernetes.io/docs/admin/authorization/node/">special-purpose authorization mode</a> called Node Authorizer, that specifically authorizes API requests made by <a href="https://kubernetes.io/docs/concepts/overview/components/#kubelet">Kubelets</a>. In order to be authorized by the Node Authorizer, Kubelets must use a credential that identifies them as being in the <code>system:nodes</code> group, with a username of <code>system:node:&lt;nodeName&gt;</code>. In this section you will create a certificate for each Kubernetes worker node that meets the Node Authorizer requirements.</p>
+<p>Generate a certificate and private key for one worker node:</p>
+<p>On master-1:</p>
+<pre><code>master-1$ cat &gt; openssl-worker-1.cnf &lt;&lt;EOF
+[req]
+req_extensions = v3_req
+distinguished_name = req_distinguished_name
+[req_distinguished_name]
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = worker-1
+IP.1 = 192.168.5.21
+EOF
+
+openssl genrsa -out worker-1.key 2048
+openssl req -new -key worker-1.key -subj &quot;/CN=system:node:worker-1/O=system:nodes&quot; -out worker-1.csr -config openssl-worker-1.cnf
+openssl x509 -req -in worker-1.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out worker-1.crt -extensions v3_req -extfile openssl-worker-1.cnf -days 1000
+</code></pre>
+<p>Results:</p>
+<pre><code>worker-1.key
+worker-1.crt
+</code></pre>
+<h3 id="the-kubelet-kubernetes-configuration-file">The kubelet Kubernetes Configuration File</h3>
+<p>When generating kubeconfig files for Kubelets the client certificate matching the Kubelet's node name must be used. This will ensure Kubelets are properly authorized by the Kubernetes <a href="https://kubernetes.io/docs/admin/authorization/node/">Node Authorizer</a>.</p>
+<p>Get the kub-api server load-balancer IP.</p>
+<pre><code>LOADBALANCER_ADDRESS=192.168.5.30
+</code></pre>
+<p>Generate a kubeconfig file for the first worker node.</p>
+<p>On master-1:</p>
+<pre><code>{
+  kubectl config set-cluster kubernetes-the-hard-way \
+    --certificate-authority=ca.crt \
+    --embed-certs=true \
+    --server=https://${LOADBALANCER_ADDRESS}:6443 \
+    --kubeconfig=worker-1.kubeconfig
+
+  kubectl config set-credentials system:node:worker-1 \
+    --client-certificate=worker-1.crt \
+    --client-key=worker-1.key \
+    --embed-certs=true \
+    --kubeconfig=worker-1.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=kubernetes-the-hard-way \
+    --user=system:node:worker-1 \
+    --kubeconfig=worker-1.kubeconfig
+
+  kubectl config use-context default --kubeconfig=worker-1.kubeconfig
+}
+</code></pre>
+<p>Results:</p>
+<pre><code>worker-1.kubeconfig
+</code></pre>
+<h3 id="copy-certificates-private-keys-and-kubeconfig-files-to-the-worker-node">Copy certificates, private keys and kubeconfig files to the worker node:</h3>
+<p>On master-1:</p>
+<pre><code>master-1$ scp ca.crt worker-1.crt worker-1.key worker-1.kubeconfig worker-1:~/
+</code></pre>
+<h3 id="download-and-install-worker-binaries">Download and Install Worker Binaries</h3>
+<p>Going forward all activities are to be done on the <code>worker-1</code> node.</p>
+<p>On worker-1:</p>
+<pre><code>worker-1$ wget -q --show-progress --https-only --timestamping \
+  https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl \
+  https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-proxy \
+  https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubelet
+</code></pre>
+<p>Reference: https://kubernetes.io/docs/setup/release/#node-binaries</p>
+<p>Create the installation directories:</p>
+<pre><code>worker-1$ sudo mkdir -p \
+  /etc/cni/net.d \
+  /opt/cni/bin \
+  /var/lib/kubelet \
+  /var/lib/kube-proxy \
+  /var/lib/kubernetes \
+  /var/run/kubernetes
+</code></pre>
+<p>Install the worker binaries:</p>
+<pre><code>{
+  chmod +x kubectl kube-proxy kubelet
+  sudo mv kubectl kube-proxy kubelet /usr/local/bin/
+}
+</code></pre>
+<h3 id="configure-the-kubelet">Configure the Kubelet</h3>
+<p>On worker-1:</p>
+<pre><code>{
+  sudo mv ${HOSTNAME}.key ${HOSTNAME}.crt /var/lib/kubelet/
+  sudo mv ${HOSTNAME}.kubeconfig /var/lib/kubelet/kubeconfig
+  sudo mv ca.crt /var/lib/kubernetes/
+}
+</code></pre>
+<p>Create the <code>kubelet-config.yaml</code> configuration file:</p>
+<pre><code>worker-1$ cat &lt;&lt;EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+authentication:
+  anonymous:
+    enabled: false
+  webhook:
+    enabled: true
+  x509:
+    clientCAFile: &quot;/var/lib/kubernetes/ca.crt&quot;
+authorization:
+  mode: Webhook
+clusterDomain: &quot;cluster.local&quot;
+clusterDNS:
+  - &quot;10.96.0.10&quot;
+resolvConf: &quot;/run/systemd/resolve/resolv.conf&quot;
+runtimeRequestTimeout: &quot;15m&quot;
+EOF
+</code></pre>
+<blockquote>
+<p>The <code>resolvConf</code> configuration is used to avoid loops when using CoreDNS for service discovery on systems running <code>systemd-resolved</code>.</p>
+</blockquote>
+<p>Create the <code>kubelet.service</code> systemd unit file:</p>
+<pre><code>worker-1$ cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kubelet.service
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/kubernetes/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/usr/local/bin/kubelet \\
+  --config=/var/lib/kubelet/kubelet-config.yaml \\
+  --image-pull-progress-deadline=2m \\
+  --kubeconfig=/var/lib/kubelet/kubeconfig \\
+  --tls-cert-file=/var/lib/kubelet/${HOSTNAME}.crt \\
+  --tls-private-key-file=/var/lib/kubelet/${HOSTNAME}.key \\
+  --network-plugin=cni \\
+  --register-node=true \\
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+</code></pre>
+<h3 id="configure-the-kubernetes-proxy">Configure the Kubernetes Proxy</h3>
+<p>On worker-1:</p>
+<pre><code>worker-1$ sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
+</code></pre>
+<p>Create the <code>kube-proxy-config.yaml</code> configuration file:</p>
+<pre><code>worker-1$ cat &lt;&lt;EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml
+kind: KubeProxyConfiguration
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+clientConnection:
+  kubeconfig: &quot;/var/lib/kube-proxy/kubeconfig&quot;
+mode: &quot;iptables&quot;
+clusterCIDR: &quot;192.168.5.0/24&quot;
+EOF
+</code></pre>
+<p>Create the <code>kube-proxy.service</code> systemd unit file:</p>
+<pre><code>worker-1$ cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kube-proxy.service
+[Unit]
+Description=Kubernetes Kube Proxy
+Documentation=https://github.com/kubernetes/kubernetes
+
+[Service]
+ExecStart=/usr/local/bin/kube-proxy \\
+  --config=/var/lib/kube-proxy/kube-proxy-config.yaml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+</code></pre>
+<h3 id="start-the-worker-services">Start the Worker Services</h3>
+<p>On worker-1:</p>
+<pre><code>{
+  sudo systemctl daemon-reload
+  sudo systemctl enable kubelet kube-proxy
+  sudo systemctl start kubelet kube-proxy
+}
+</code></pre>
+<blockquote>
+<p>Remember to run the above commands on worker node: <code>worker-1</code></p>
+</blockquote>
+<h2 id="verification">Verification</h2>
+<p>On master-1:</p>
+<p>List the registered Kubernetes nodes from the master node:</p>
+<pre><code>master-1$ kubectl get nodes --kubeconfig admin.kubeconfig
+</code></pre>
+<blockquote>
+<p>output</p>
+</blockquote>
+<pre><code>NAME       STATUS     ROLES    AGE   VERSION
+worker-1   NotReady   &lt;none&gt;   93s   v1.13.0
+</code></pre>
+<blockquote>
+<p>Note: It is OK for the worker node to be in a NotReady state.
+  That is because we haven't configured Networking yet.</p>
+</blockquote>
+<p>Optional: At this point you may run the certificate verification script to make sure all certificates are configured correctly. Follow the instructions <a href="../verify-certificates/">here</a></p>
+<p>Next: <a href="../10-tls-bootstrapping-kubernetes-workers/">TLS Bootstrapping Kubernetes Workers</a></p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../08-bootstrapping-kubernetes-controllers/" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              8. Bootstrapping the Kubernetes Control Plane
+            </div>
+          </div>
+        </a>
+      
+      
+        <a href="../10-tls-bootstrapping-kubernetes-workers/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              10. TLS Bootstrapping Worker Nodes
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      
+    
+  </body>
+</html>
