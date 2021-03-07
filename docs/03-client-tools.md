@@ -1,4 +1,4 @@
-# Installing the Client Tools
+# 3. Installing the Client Tools
 
 First identify a system from where you will perform administrative tasks, such as creating certificates, kubeconfig files and distributing them to the different VMs.
 

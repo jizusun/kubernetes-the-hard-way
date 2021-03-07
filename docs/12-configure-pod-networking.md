@@ -1,4 +1,4 @@
-# Provisioning Pod Network
+# 12. Provisioning Pod Network
 
 We chose to use CNI - [weave](https://www.weave.works/docs/net/latest/kubernetes/kube-addon/) as our networking option.
 

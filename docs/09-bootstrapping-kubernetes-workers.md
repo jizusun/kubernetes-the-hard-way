@@ -1,4 +1,4 @@
-# Bootstrapping the Kubernetes Worker Nodes
+# 9. Bootstrapping the Kubernetes Worker Nodes
 
 In this lab you will bootstrap 2 Kubernetes worker nodes. We already have [Docker](https://www.docker.com) installed on these nodes.
 

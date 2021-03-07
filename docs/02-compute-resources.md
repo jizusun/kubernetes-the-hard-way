@@ -1,4 +1,4 @@
-# Provisioning Compute Resources
+# 2. Provisioning Compute Resources
 
 Note: You must have VirtualBox and Vagrant configured at this point
 

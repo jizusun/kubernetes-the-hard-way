@@ -1,4 +1,4 @@
-# Dynamic Kubelet Configuration
+# 17. Dynamic Kubelet Configuration
 
 `sudo apt install -y jq`
 

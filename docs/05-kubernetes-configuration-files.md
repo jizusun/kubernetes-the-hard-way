@@ -1,4 +1,4 @@
-# Generating Kubernetes Configuration Files for Authentication
+# 5. Generating Kubernetes Configuration Files for Authentication
 
 In this lab you will generate [Kubernetes configuration files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/), also known as kubeconfigs, which enable Kubernetes clients to locate and authenticate to the Kubernetes API Servers.
 

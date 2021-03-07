@@ -1,4 +1,4 @@
-# TLS Bootstrapping Worker Nodes
+# 10. TLS Bootstrapping Worker Nodes
 
 In the previous step we configured a worker node by
 - Creating a set of key pairs for the worker node by ourself

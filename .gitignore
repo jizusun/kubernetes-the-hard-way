@@ -56,3 +56,5 @@ certs
 .DS_Store
 ssh_config
 vagrant/*.sh
+
+site
