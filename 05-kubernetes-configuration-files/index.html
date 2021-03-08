@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -693,128 +693,128 @@
 <p>In this section you will generate kubeconfig files for the <code>controller manager</code>, <code>kube-proxy</code>, <code>scheduler</code> clients and the <code>admin</code> user.</p>
 <h3 id="kubernetes-public-ip-address">Kubernetes Public IP Address</h3>
 <p>Each kubeconfig requires a Kubernetes API Server to connect to. To support high availability the IP address assigned to the load balancer will be used. In our case it is <code>192.168.5.30</code></p>
-<pre><code>LOADBALANCER_ADDRESS=192.168.5.30
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nv">LOADBALANCER_ADDRESS</span><span class="o">=</span><span class="m">192</span>.168.5.30
+</code></pre></div>
 <h3 id="the-kube-proxy-kubernetes-configuration-file">The kube-proxy Kubernetes Configuration File</h3>
 <p>Generate a kubeconfig file for the <code>kube-proxy</code> service:</p>
-<pre><code>{
-  kubectl config set-cluster kubernetes-the-hard-way \
-    --certificate-authority=ca.crt \
-    --embed-certs=true \
-    --server=https://${LOADBALANCER_ADDRESS}:6443 \
-    --kubeconfig=kube-proxy.kubeconfig
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
+  kubectl config set-cluster kubernetes-the-hard-way <span class="se">\</span>
+    --certificate-authority<span class="o">=</span>ca.crt <span class="se">\</span>
+    --embed-certs<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    --server<span class="o">=</span>https://<span class="si">${</span><span class="nv">LOADBALANCER_ADDRESS</span><span class="si">}</span>:6443 <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>kube-proxy.kubeconfig
 
-  kubectl config set-credentials system:kube-proxy \
-    --client-certificate=kube-proxy.crt \
-    --client-key=kube-proxy.key \
-    --embed-certs=true \
-    --kubeconfig=kube-proxy.kubeconfig
+  kubectl config set-credentials system:kube-proxy <span class="se">\</span>
+    --client-certificate<span class="o">=</span>kube-proxy.crt <span class="se">\</span>
+    --client-key<span class="o">=</span>kube-proxy.key <span class="se">\</span>
+    --embed-certs<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>kube-proxy.kubeconfig
 
-  kubectl config set-context default \
-    --cluster=kubernetes-the-hard-way \
-    --user=system:kube-proxy \
-    --kubeconfig=kube-proxy.kubeconfig
+  kubectl config set-context default <span class="se">\</span>
+    --cluster<span class="o">=</span>kubernetes-the-hard-way <span class="se">\</span>
+    --user<span class="o">=</span>system:kube-proxy <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>kube-proxy.kubeconfig
 
-  kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
-}
-</code></pre>
+  kubectl config use-context default --kubeconfig<span class="o">=</span>kube-proxy.kubeconfig
+<span class="o">}</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>kube-proxy.kubeconfig
-</code></pre>
+<div class="highlight"><pre><span></span><code>kube-proxy.kubeconfig
+</code></pre></div>
 <p>Reference docs for kube-proxy <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/">here</a></p>
 <h3 id="the-kube-controller-manager-kubernetes-configuration-file">The kube-controller-manager Kubernetes Configuration File</h3>
 <p>Generate a kubeconfig file for the <code>kube-controller-manager</code> service:</p>
-<pre><code>{
-  kubectl config set-cluster kubernetes-the-hard-way \
-    --certificate-authority=ca.crt \
-    --embed-certs=true \
-    --server=https://127.0.0.1:6443 \
-    --kubeconfig=kube-controller-manager.kubeconfig
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
+  kubectl config set-cluster kubernetes-the-hard-way <span class="se">\</span>
+    --certificate-authority<span class="o">=</span>ca.crt <span class="se">\</span>
+    --embed-certs<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    --server<span class="o">=</span>https://127.0.0.1:6443 <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>kube-controller-manager.kubeconfig
 
-  kubectl config set-credentials system:kube-controller-manager \
-    --client-certificate=kube-controller-manager.crt \
-    --client-key=kube-controller-manager.key \
-    --embed-certs=true \
-    --kubeconfig=kube-controller-manager.kubeconfig
+  kubectl config set-credentials system:kube-controller-manager <span class="se">\</span>
+    --client-certificate<span class="o">=</span>kube-controller-manager.crt <span class="se">\</span>
+    --client-key<span class="o">=</span>kube-controller-manager.key <span class="se">\</span>
+    --embed-certs<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>kube-controller-manager.kubeconfig
 
-  kubectl config set-context default \
-    --cluster=kubernetes-the-hard-way \
-    --user=system:kube-controller-manager \
-    --kubeconfig=kube-controller-manager.kubeconfig
+  kubectl config set-context default <span class="se">\</span>
+    --cluster<span class="o">=</span>kubernetes-the-hard-way <span class="se">\</span>
+    --user<span class="o">=</span>system:kube-controller-manager <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>kube-controller-manager.kubeconfig
 
-  kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
-}
-</code></pre>
+  kubectl config use-context default --kubeconfig<span class="o">=</span>kube-controller-manager.kubeconfig
+<span class="o">}</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>kube-controller-manager.kubeconfig
-</code></pre>
+<div class="highlight"><pre><span></span><code>kube-controller-manager.kubeconfig
+</code></pre></div>
 <p>Reference docs for kube-controller-manager <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/">here</a></p>
 <h3 id="the-kube-scheduler-kubernetes-configuration-file">The kube-scheduler Kubernetes Configuration File</h3>
 <p>Generate a kubeconfig file for the <code>kube-scheduler</code> service:</p>
-<pre><code>{
-  kubectl config set-cluster kubernetes-the-hard-way \
-    --certificate-authority=ca.crt \
-    --embed-certs=true \
-    --server=https://127.0.0.1:6443 \
-    --kubeconfig=kube-scheduler.kubeconfig
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
+  kubectl config set-cluster kubernetes-the-hard-way <span class="se">\</span>
+    --certificate-authority<span class="o">=</span>ca.crt <span class="se">\</span>
+    --embed-certs<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    --server<span class="o">=</span>https://127.0.0.1:6443 <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>kube-scheduler.kubeconfig
 
-  kubectl config set-credentials system:kube-scheduler \
-    --client-certificate=kube-scheduler.crt \
-    --client-key=kube-scheduler.key \
-    --embed-certs=true \
-    --kubeconfig=kube-scheduler.kubeconfig
+  kubectl config set-credentials system:kube-scheduler <span class="se">\</span>
+    --client-certificate<span class="o">=</span>kube-scheduler.crt <span class="se">\</span>
+    --client-key<span class="o">=</span>kube-scheduler.key <span class="se">\</span>
+    --embed-certs<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>kube-scheduler.kubeconfig
 
-  kubectl config set-context default \
-    --cluster=kubernetes-the-hard-way \
-    --user=system:kube-scheduler \
-    --kubeconfig=kube-scheduler.kubeconfig
+  kubectl config set-context default <span class="se">\</span>
+    --cluster<span class="o">=</span>kubernetes-the-hard-way <span class="se">\</span>
+    --user<span class="o">=</span>system:kube-scheduler <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>kube-scheduler.kubeconfig
 
-  kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig
-}
-</code></pre>
+  kubectl config use-context default --kubeconfig<span class="o">=</span>kube-scheduler.kubeconfig
+<span class="o">}</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>kube-scheduler.kubeconfig
-</code></pre>
+<div class="highlight"><pre><span></span><code>kube-scheduler.kubeconfig
+</code></pre></div>
 <p>Reference docs for kube-scheduler <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/">here</a></p>
 <h3 id="the-admin-kubernetes-configuration-file">The admin Kubernetes Configuration File</h3>
 <p>Generate a kubeconfig file for the <code>admin</code> user:</p>
-<pre><code>{
-  kubectl config set-cluster kubernetes-the-hard-way \
-    --certificate-authority=ca.crt \
-    --embed-certs=true \
-    --server=https://127.0.0.1:6443 \
-    --kubeconfig=admin.kubeconfig
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
+  kubectl config set-cluster kubernetes-the-hard-way <span class="se">\</span>
+    --certificate-authority<span class="o">=</span>ca.crt <span class="se">\</span>
+    --embed-certs<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    --server<span class="o">=</span>https://127.0.0.1:6443 <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>admin.kubeconfig
 
-  kubectl config set-credentials admin \
-    --client-certificate=admin.crt \
-    --client-key=admin.key \
-    --embed-certs=true \
-    --kubeconfig=admin.kubeconfig
+  kubectl config set-credentials admin <span class="se">\</span>
+    --client-certificate<span class="o">=</span>admin.crt <span class="se">\</span>
+    --client-key<span class="o">=</span>admin.key <span class="se">\</span>
+    --embed-certs<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>admin.kubeconfig
 
-  kubectl config set-context default \
-    --cluster=kubernetes-the-hard-way \
-    --user=admin \
-    --kubeconfig=admin.kubeconfig
+  kubectl config set-context default <span class="se">\</span>
+    --cluster<span class="o">=</span>kubernetes-the-hard-way <span class="se">\</span>
+    --user<span class="o">=</span>admin <span class="se">\</span>
+    --kubeconfig<span class="o">=</span>admin.kubeconfig
 
-  kubectl config use-context default --kubeconfig=admin.kubeconfig
-}
-</code></pre>
+  kubectl config use-context default --kubeconfig<span class="o">=</span>admin.kubeconfig
+<span class="o">}</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>admin.kubeconfig
-</code></pre>
+<div class="highlight"><pre><span></span><code>admin.kubeconfig
+</code></pre></div>
 <p>Reference docs for kubeconfig <a href="https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/">here</a></p>
 <h2 id="_1"></h2>
 <h2 id="distribute-the-kubernetes-configuration-files">Distribute the Kubernetes Configuration Files</h2>
 <p>Copy the appropriate <code>kube-proxy</code> kubeconfig files to each worker instance:</p>
-<pre><code>for instance in worker-1 worker-2; do
-  scp kube-proxy.kubeconfig ${instance}:~/
-done
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> instance <span class="k">in</span> worker-1 worker-2<span class="p">;</span> <span class="k">do</span>
+  scp kube-proxy.kubeconfig <span class="si">${</span><span class="nv">instance</span><span class="si">}</span>:~/
+<span class="k">done</span>
+</code></pre></div>
 <p>Copy the appropriate <code>admin.kubeconfig</code>, <code>kube-controller-manager</code> and <code>kube-scheduler</code> kubeconfig files to each controller instance:</p>
-<pre><code>for instance in master-1 master-2; do
-  scp admin.kubeconfig kube-controller-manager.kubeconfig kube-scheduler.kubeconfig ${instance}:~/
-done
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> instance <span class="k">in</span> master-1 master-2<span class="p">;</span> <span class="k">do</span>
+  scp admin.kubeconfig kube-controller-manager.kubeconfig kube-scheduler.kubeconfig <span class="si">${</span><span class="nv">instance</span><span class="si">}</span>:~/
+<span class="k">done</span>
+</code></pre></div>
 <p>Next: <a href="../06-data-encryption-keys/">Generating the Data Encryption Config and Key</a></p>
                 
               
@@ -872,6 +872,7 @@ done
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -885,7 +886,7 @@ done
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

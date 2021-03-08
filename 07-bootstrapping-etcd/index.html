@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -694,84 +694,87 @@
 <h2 id="bootstrapping-an-etcd-cluster-member">Bootstrapping an etcd Cluster Member</h2>
 <h3 id="download-and-install-the-etcd-binaries">Download and Install the etcd Binaries</h3>
 <p>Download the official etcd release binaries from the <a href="https://github.com/coreos/etcd">coreos/etcd</a> GitHub project:</p>
-<pre><code>wget -q --show-progress --https-only --timestamping \
-  &quot;https://github.com/coreos/etcd/releases/download/v3.3.9/etcd-v3.3.9-linux-amd64.tar.gz&quot;
-</code></pre>
+<div class="highlight"><pre><span></span><code>wget -q --show-progress --https-only --timestamping <span class="se">\</span>
+  <span class="s2">&quot;https://github.com/coreos/etcd/releases/download/v3.3.9/etcd-v3.3.9-linux-amd64.tar.gz&quot;</span>
+</code></pre></div>
 <p>Extract and install the <code>etcd</code> server and the <code>etcdctl</code> command line utility:</p>
-<pre><code>{
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
   tar -xvf etcd-v3.3.9-linux-amd64.tar.gz
   sudo mv etcd-v3.3.9-linux-amd64/etcd* /usr/local/bin/
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <h3 id="configure-the-etcd-server">Configure the etcd Server</h3>
-<pre><code>{
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
   sudo mkdir -p /etc/etcd /var/lib/etcd
   sudo cp ca.crt etcd-server.key etcd-server.crt /etc/etcd/
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <p>The instance internal IP address will be used to serve client requests and communicate with etcd cluster peers. Retrieve the internal IP address of the master(etcd) nodes:</p>
-<pre><code>INTERNAL_IP=$(ip addr show enp0s8 | grep &quot;inet &quot; | awk '{print $2}' | cut -d / -f 1)
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nv">INTERNAL_IP</span><span class="o">=</span><span class="k">$(</span>ip addr show enp0s8 <span class="p">|</span> grep <span class="s2">&quot;inet &quot;</span> <span class="p">|</span> awk <span class="s1">&#39;{print $2}&#39;</span> <span class="p">|</span> cut -d / -f <span class="m">1</span><span class="k">)</span>
+</code></pre></div>
 <p>Each etcd member must have a unique name within an etcd cluster. Set the etcd name to match the hostname of the current compute instance:</p>
-<pre><code>ETCD_NAME=$(hostname -s)
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nv">ETCD_NAME</span><span class="o">=</span><span class="k">$(</span>hostname -s<span class="k">)</span>
+</code></pre></div>
 <p>Create the <code>etcd.service</code> systemd unit file:</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /etc/systemd/system/etcd.service
-[Unit]
-Description=etcd
-Documentation=https://github.com/coreos
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/etcd.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=etcd</span>
+<span class="s">Documentation=https://github.com/coreos</span>
 
-[Service]
-ExecStart=/usr/local/bin/etcd \\
-  --name ${ETCD_NAME} \\
-  --cert-file=/etc/etcd/etcd-server.crt \\
-  --key-file=/etc/etcd/etcd-server.key \\
-  --peer-cert-file=/etc/etcd/etcd-server.crt \\
-  --peer-key-file=/etc/etcd/etcd-server.key \\
-  --trusted-ca-file=/etc/etcd/ca.crt \\
-  --peer-trusted-ca-file=/etc/etcd/ca.crt \\
-  --peer-client-cert-auth \\
-  --client-cert-auth \\
-  --initial-advertise-peer-urls https://${INTERNAL_IP}:2380 \\
-  --listen-peer-urls https://${INTERNAL_IP}:2380 \\
-  --listen-client-urls https://${INTERNAL_IP}:2379,https://127.0.0.1:2379 \\
-  --advertise-client-urls https://${INTERNAL_IP}:2379 \\
-  --initial-cluster-token etcd-cluster-0 \\
-  --initial-cluster master-1=https://192.168.5.11:2380,master-2=https://192.168.5.12:2380 \\
-  --initial-cluster-state new \\
-  --data-dir=/var/lib/etcd
-Restart=on-failure
-RestartSec=5
+<span class="s">[Service]</span>
+<span class="s">ExecStart=/usr/local/bin/etcd \\</span>
+<span class="s">  --name ${ETCD_NAME} \\</span>
+<span class="s">  --cert-file=/etc/etcd/etcd-server.crt \\</span>
+<span class="s">  --key-file=/etc/etcd/etcd-server.key \\</span>
+<span class="s">  --peer-cert-file=/etc/etcd/etcd-server.crt \\</span>
+<span class="s">  --peer-key-file=/etc/etcd/etcd-server.key \\</span>
+<span class="s">  --trusted-ca-file=/etc/etcd/ca.crt \\</span>
+<span class="s">  --peer-trusted-ca-file=/etc/etcd/ca.crt \\</span>
+<span class="s">  --peer-client-cert-auth \\</span>
+<span class="s">  --client-cert-auth \\</span>
+<span class="s">  --initial-advertise-peer-urls https://${INTERNAL_IP}:2380 \\</span>
+<span class="s">  --listen-peer-urls https://${INTERNAL_IP}:2380 \\</span>
+<span class="s">  --listen-client-urls https://${INTERNAL_IP}:2379,https://127.0.0.1:2379 \\</span>
+<span class="s">  --advertise-client-urls https://${INTERNAL_IP}:2379 \\</span>
+<span class="s">  --initial-cluster-token etcd-cluster-0 \\</span>
+<span class="s">  --initial-cluster master-1=https://192.168.5.11:2380,master-2=https://192.168.5.12:2380 \\</span>
+<span class="s">  --initial-cluster-state new \\</span>
+<span class="s">  --data-dir=/var/lib/etcd</span>
+<span class="s">Restart=on-failure</span>
+<span class="s">RestartSec=5</span>
 
-[Install]
-WantedBy=multi-user.target
-EOF
-</code></pre>
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <h3 id="start-the-etcd-server">Start the etcd Server</h3>
-<pre><code>{
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
   sudo systemctl daemon-reload
-  sudo systemctl enable etcd
+  sudo systemctl <span class="nb">enable</span> etcd
   sudo systemctl start etcd
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <blockquote>
 <p>Remember to run the above commands on each controller node: <code>master-1</code>, and <code>master-2</code>.</p>
 </blockquote>
 <h2 id="verification">Verification</h2>
 <p>List the etcd cluster members:</p>
-<pre><code>sudo ETCDCTL_API=3 etcdctl member list \
-  --endpoints=https://127.0.0.1:2379 \
-  --cacert=/etc/etcd/ca.crt \
-  --cert=/etc/etcd/etcd-server.crt \
-  --key=/etc/etcd/etcd-server.key
-</code></pre>
+<div class="highlight"><pre><span></span><code>sudo <span class="nv">ETCDCTL_API</span><span class="o">=</span><span class="m">3</span> etcdctl member list <span class="se">\</span>
+  --endpoints<span class="o">=</span>https://127.0.0.1:2379 <span class="se">\</span>
+  --cacert<span class="o">=</span>/etc/etcd/ca.crt <span class="se">\</span>
+  --cert<span class="o">=</span>/etc/etcd/etcd-server.crt <span class="se">\</span>
+  --key<span class="o">=</span>/etc/etcd/etcd-server.key
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>45bf9ccad8d8900a, started, master-2, https://192.168.5.12:2380, https://192.168.5.12:2379
+<div class="highlight"><pre><span></span><code>45bf9ccad8d8900a, started, master-2, https://192.168.5.12:2380, https://192.168.5.12:2379
 54a5796a6803f252, started, master-1, https://192.168.5.11:2380, https://192.168.5.11:2379
-</code></pre>
-<p>Reference: https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#starting-etcd-clusters</p>
+</code></pre></div>
+<p>Reference: </p>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#starting-etcd-clusters">https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#starting-etcd-clusters</a></li>
+</ul>
 <p>Next: <a href="../08-bootstrapping-kubernetes-controllers/">Bootstrapping the Kubernetes Control Plane</a></p>
                 
               
@@ -829,6 +832,7 @@ EOF
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -842,7 +846,7 @@ EOF
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -755,10 +755,10 @@ Vagrant generates a private key for each of these VMs. It is placed under the .v
 <p><code>vagrant up</code></p>
 <p>Sometimes the delete does not delete the folder created for the vm and throws the below error.</p>
 <p>VirtualBox error:</p>
-<pre><code>VBoxManage.exe: error: Could not rename the directory 'D:\VirtualBox VMs\ubuntu-bionic-18.04-cloudimg-20190122_1552891552601_76806' to 'D:\VirtualBox VMs\kubernetes-ha-worker-2' to save the settings file (VERR_ALREADY_EXISTS)
+<div class="highlight"><pre><span></span><code>VBoxManage.exe: error: Could not rename the directory &#39;D:\VirtualBox VMs\ubuntu-bionic-18.04-cloudimg-20190122_1552891552601_76806&#39; to &#39;D:\VirtualBox VMs\kubernetes-ha-worker-2&#39; to save the settings file (VERR_ALREADY_EXISTS)
 VBoxManage.exe: error: Details: code E_FAIL (0x80004005), component SessionMachine, interface IMachine, callee IUnknown
-VBoxManage.exe: error: Context: "SaveSettings()" at line 3105 of file VBoxManageModifyVM.cpp
-</code></pre>
+VBoxManage.exe: error: Context: &quot;SaveSettings()&quot; at line 3105 of file VBoxManageModifyVM.cpp
+</code></pre></div>
 <p>In such cases delete the VM, then delete the VM folder and then re-provision</p>
 <p><code>vagrant destroy &lt;vm&gt;</code></p>
 <p><code>rmdir "&lt;path-to-vm-folder&gt;\kubernetes-ha-worker-2"</code></p>
@@ -819,6 +819,7 @@ VBoxManage.exe: error: Context: "SaveSettings()" at line 3105 of file VBoxManage
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -832,7 +833,7 @@ VBoxManage.exe: error: Context: "SaveSettings()" at line 3105 of file VBoxManage
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

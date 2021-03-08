@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -535,39 +535,39 @@
                 
                 <h1 id="17-dynamic-kubelet-configuration">17. Dynamic Kubelet Configuration</h1>
 <p><code>sudo apt install -y jq</code></p>
-<pre><code>NODE_NAME=&quot;worker-1&quot;; NODE_NAME=&quot;worker-1&quot;; curl -sSL &quot;https://localhost:6443/api/v1/nodes/${NODE_NAME}/proxy/configz&quot; -k --cert admin.crt --key admin.key | jq '.kubeletconfig|.kind=&quot;KubeletConfiguration&quot;|.apiVersion=&quot;kubelet.config.k8s.io/v1beta1&quot;' &gt; kubelet_configz_${NODE_NAME}
-</code></pre>
-<pre><code>kubectl -n kube-system create configmap nodes-config --from-file=kubelet=kubelet_configz_${NODE_NAME} --append-hash -o yaml
-</code></pre>
-<p>Edit node to use the dynamically created configuration</p>
-<pre><code>kubectl edit worker-2
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nv">NODE_NAME</span><span class="o">=</span><span class="s2">&quot;worker-1&quot;</span><span class="p">;</span> <span class="nv">NODE_NAME</span><span class="o">=</span><span class="s2">&quot;worker-1&quot;</span><span class="p">;</span> curl -sSL <span class="s2">&quot;https://localhost:6443/api/v1/nodes/</span><span class="si">${</span><span class="nv">NODE_NAME</span><span class="si">}</span><span class="s2">/proxy/configz&quot;</span> -k --cert admin.crt --key admin.key <span class="p">|</span> jq <span class="s1">&#39;.kubeletconfig|.kind=&quot;KubeletConfiguration&quot;|.apiVersion=&quot;kubelet.config.k8s.io/v1beta1&quot;&#39;</span> &gt; kubelet_configz_<span class="si">${</span><span class="nv">NODE_NAME</span><span class="si">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>kubectl -n kube-system create configmap nodes-config --from-file<span class="o">=</span><span class="nv">kubelet</span><span class="o">=</span>kubelet_configz_<span class="si">${</span><span class="nv">NODE_NAME</span><span class="si">}</span> --append-hash -o yaml
+</code></pre></div>
+<p>Edit node to use the dynamically created configuration
+<div class="highlight"><pre><span></span><code>kubectl edit worker-2
+</code></pre></div></p>
 <p>Configure Kubelet Service</p>
 <p>Create the <code>kubelet.service</code> systemd unit file:</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kubelet.service
-[Unit]
-Description=Kubernetes Kubelet
-Documentation=https://github.com/kubernetes/kubernetes
-After=docker.service
-Requires=docker.service
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kubelet.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=Kubernetes Kubelet</span>
+<span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
+<span class="s">After=docker.service</span>
+<span class="s">Requires=docker.service</span>
 
-[Service]
-ExecStart=/usr/local/bin/kubelet \\
-  --bootstrap-kubeconfig=&quot;/var/lib/kubelet/bootstrap-kubeconfig&quot; \\
-  --image-pull-progress-deadline=2m \\
-  --kubeconfig=/var/lib/kubelet/kubeconfig \\
-  --dynamic-config-dir=/var/lib/kubelet/dynamic-config \\
-  --cert-dir= /var/lib/kubelet/ \\
-  --network-plugin=cni \\
-  --register-node=true \\
-  --v=2
-Restart=on-failure
-RestartSec=5
+<span class="s">[Service]</span>
+<span class="s">ExecStart=/usr/local/bin/kubelet \\</span>
+<span class="s">  --bootstrap-kubeconfig=&quot;/var/lib/kubelet/bootstrap-kubeconfig&quot; \\</span>
+<span class="s">  --image-pull-progress-deadline=2m \\</span>
+<span class="s">  --kubeconfig=/var/lib/kubelet/kubeconfig \\</span>
+<span class="s">  --dynamic-config-dir=/var/lib/kubelet/dynamic-config \\</span>
+<span class="s">  --cert-dir= /var/lib/kubelet/ \\</span>
+<span class="s">  --network-plugin=cni \\</span>
+<span class="s">  --register-node=true \\</span>
+<span class="s">  --v=2</span>
+<span class="s">Restart=on-failure</span>
+<span class="s">RestartSec=5</span>
 
-[Install]
-WantedBy=multi-user.target
-EOF
-</code></pre>
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</code></pre></div>
                 
               
               
@@ -624,6 +624,7 @@ EOF
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -637,7 +638,7 @@ EOF
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

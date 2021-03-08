@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -539,9 +539,9 @@
 </blockquote>
 <p>This script was developed to assist the verification of certificates for each Kubernetes component as part of building the cluster. This script may be executed as soon as you have completed the Lab steps up to <a href="../09-bootstrapping-kubernetes-workers/">Bootstrapping the Kubernetes Worker Nodes</a>. The script is named as <code>cert_verify.sh</code> and it is available at <code>/home/vagrant</code> directory of master-1 , master-2 and worker-1 nodes. If it's not already available there copy the script to the nodes from <a href="../vagrant/ubuntu/cert_verify.sh">here</a>.</p>
 <p>It is important that the script execution needs to be done by following commands after logging into the respective virtual machines [ whether it is master-1 / master-2 / worker-1 ] via SSH.</p>
-<pre><code class="language-bash">cd /home/vagrant
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span> /home/vagrant
 bash cert_verify.sh
-</code></pre>
+</code></pre></div>
 <p>Following are the successful output of script execution under different nodes,</p>
 <ol>
 <li>
@@ -600,6 +600,7 @@ bash cert_verify.sh
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -613,7 +614,7 @@ bash cert_verify.sh
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

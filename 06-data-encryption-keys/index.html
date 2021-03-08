@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -596,30 +596,30 @@
 <p>In this lab you will generate an encryption key and an <a href="https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#understanding-the-encryption-at-rest-configuration">encryption config</a> suitable for encrypting Kubernetes Secrets.</p>
 <h2 id="the-encryption-key">The Encryption Key</h2>
 <p>Generate an encryption key:</p>
-<pre><code>ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64)
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nv">ENCRYPTION_KEY</span><span class="o">=</span><span class="k">$(</span>head -c <span class="m">32</span> /dev/urandom <span class="p">|</span> base64<span class="k">)</span>
+</code></pre></div>
 <h2 id="the-encryption-config-file">The Encryption Config File</h2>
 <p>Create the <code>encryption-config.yaml</code> encryption config file:</p>
-<pre><code>cat &gt; encryption-config.yaml &lt;&lt;EOF
-kind: EncryptionConfig
-apiVersion: v1
-resources:
-  - resources:
-      - secrets
-    providers:
-      - aescbc:
-          keys:
-            - name: key1
-              secret: ${ENCRYPTION_KEY}
-      - identity: {}
-EOF
-</code></pre>
+<div class="highlight"><pre><span></span><code>cat &gt; encryption-config.yaml <span class="s">&lt;&lt;EOF</span>
+<span class="s">kind: EncryptionConfig</span>
+<span class="s">apiVersion: v1</span>
+<span class="s">resources:</span>
+<span class="s">  - resources:</span>
+<span class="s">      - secrets</span>
+<span class="s">    providers:</span>
+<span class="s">      - aescbc:</span>
+<span class="s">          keys:</span>
+<span class="s">            - name: key1</span>
+<span class="s">              secret: ${ENCRYPTION_KEY}</span>
+<span class="s">      - identity: {}</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <p>Copy the <code>encryption-config.yaml</code> encryption config file to each controller instance:</p>
-<pre><code>for instance in master-1 master-2; do
-  scp encryption-config.yaml ${instance}:~/
-done
-</code></pre>
-<p>Reference: https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#encrypting-your-data</p>
+<p><div class="highlight"><pre><span></span><code><span class="k">for</span> instance <span class="k">in</span> master-1 master-2<span class="p">;</span> <span class="k">do</span>
+  scp encryption-config.yaml <span class="si">${</span><span class="nv">instance</span><span class="si">}</span>:~/
+<span class="k">done</span>
+</code></pre></div>
+Reference: https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#encrypting-your-data</p>
 <p>Next: <a href="../07-bootstrapping-etcd/">Bootstrapping the etcd Cluster</a></p>
                 
               
@@ -677,6 +677,7 @@ done
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -690,7 +691,7 @@ done
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

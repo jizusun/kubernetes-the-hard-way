@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -595,54 +595,57 @@
 <p>In this lab you will deploy the <a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/">DNS add-on</a> which provides DNS based service discovery, backed by <a href="https://coredns.io/">CoreDNS</a>, to applications running inside the Kubernetes cluster.</p>
 <h2 id="the-dns-cluster-add-on">The DNS Cluster Add-on</h2>
 <p>Deploy the <code>coredns</code> cluster add-on:</p>
-<pre><code>kubectl apply -f https://raw.githubusercontent.com/mmumshad/kubernetes-the-hard-way/master/deployments/coredns.yaml
-</code></pre>
+<div class="highlight"><pre><span></span><code>kubectl apply -f https://raw.githubusercontent.com/mmumshad/kubernetes-the-hard-way/master/deployments/coredns.yaml
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>serviceaccount/coredns created
+<div class="highlight"><pre><span></span><code>serviceaccount/coredns created
 clusterrole.rbac.authorization.k8s.io/system:coredns created
 clusterrolebinding.rbac.authorization.k8s.io/system:coredns created
 configmap/coredns created
 deployment.extensions/coredns created
 service/kube-dns created
-</code></pre>
+</code></pre></div>
 <p>List the pods created by the <code>kube-dns</code> deployment:</p>
-<pre><code>kubectl get pods -l k8s-app=kube-dns -n kube-system
-</code></pre>
+<div class="highlight"><pre><span></span><code>kubectl get pods -l k8s-app<span class="o">=</span>kube-dns -n kube-system
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>NAME                       READY   STATUS    RESTARTS   AGE
-coredns-699f8ddd77-94qv9   1/1     Running   0          20s
-coredns-699f8ddd77-gtcgb   1/1     Running   0          20s
-</code></pre>
-<p>Reference: https://kubernetes.io/docs/tasks/administer-cluster/coredns/#installing-coredns</p>
+<div class="highlight"><pre><span></span><code>NAME                       READY   STATUS    RESTARTS   AGE
+coredns-699f8ddd77-94qv9   <span class="m">1</span>/1     Running   <span class="m">0</span>          20s
+coredns-699f8ddd77-gtcgb   <span class="m">1</span>/1     Running   <span class="m">0</span>          20s
+</code></pre></div>
+<p>Reference: </p>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/administer-cluster/coredns/#installing-coredns">https://kubernetes.io/docs/tasks/administer-cluster/coredns/#installing-coredns</a></li>
+</ul>
 <h2 id="verification">Verification</h2>
 <p>Create a <code>busybox</code> deployment:</p>
-<pre><code>kubectl run --generator=run-pod/v1  busybox --image=busybox:1.28 --command -- sleep 3600
-</code></pre>
+<div class="highlight"><pre><span></span><code>kubectl run --generator<span class="o">=</span>run-pod/v1  busybox --image<span class="o">=</span>busybox:1.28 --command -- sleep <span class="m">3600</span>
+</code></pre></div>
 <p>List the pod created by the <code>busybox</code> deployment:</p>
-<pre><code>kubectl get pods -l run=busybox
-</code></pre>
+<div class="highlight"><pre><span></span><code>kubectl get pods -l <span class="nv">run</span><span class="o">=</span>busybox
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>NAME                      READY   STATUS    RESTARTS   AGE
-busybox-bd8fb7cbd-vflm9   1/1     Running   0          10s
-</code></pre>
+<div class="highlight"><pre><span></span><code>NAME                      READY   STATUS    RESTARTS   AGE
+busybox-bd8fb7cbd-vflm9   <span class="m">1</span>/1     Running   <span class="m">0</span>          10s
+</code></pre></div>
 <p>Execute a DNS lookup for the <code>kubernetes</code> service inside the <code>busybox</code> pod:</p>
-<pre><code>kubectl exec -ti busybox -- nslookup kubernetes
-</code></pre>
+<div class="highlight"><pre><span></span><code>kubectl <span class="nb">exec</span> -ti busybox -- nslookup kubernetes
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>Server:    10.96.0.10
-Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+<div class="highlight"><pre><span></span><code>Server:    <span class="m">10</span>.96.0.10
+Address <span class="m">1</span>: <span class="m">10</span>.96.0.10 kube-dns.kube-system.svc.cluster.local
 
 Name:      kubernetes
-Address 1: 10.96.0.1 kubernetes.default.svc.cluster.local
-</code></pre>
+Address <span class="m">1</span>: <span class="m">10</span>.96.0.1 kubernetes.default.svc.cluster.local
+</code></pre></div>
 <p>Next: <a href="../15-smoke-test/">Smoke Test</a></p>
                 
               
@@ -700,6 +703,7 @@ Address 1: 10.96.0.1 kubernetes.default.svc.cluster.local
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -713,7 +717,7 @@ Address 1: 10.96.0.1 kubernetes.default.svc.cluster.local
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

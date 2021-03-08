@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -703,9 +703,11 @@
                 
                 <h1 id="9-bootstrapping-the-kubernetes-worker-nodes">9. Bootstrapping the Kubernetes Worker Nodes</h1>
 <p>In this lab you will bootstrap 2 Kubernetes worker nodes. We already have <a href="https://www.docker.com">Docker</a> installed on these nodes.</p>
-<p>We will now install the kubernetes components
-- <a href="https://kubernetes.io/docs/admin/kubelet">kubelet</a>
-- <a href="https://kubernetes.io/docs/concepts/cluster-administration/proxies">kube-proxy</a>.</p>
+<p>We will now install the kubernetes components</p>
+<ul>
+<li><a href="https://kubernetes.io/docs/admin/kubelet">kubelet</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/cluster-administration/proxies">kube-proxy</a>.</li>
+</ul>
 <h2 id="prerequisites">Prerequisites</h2>
 <p>The Certificates and Configuration are created on <code>master-1</code> node and then copied over to workers using <code>scp</code>. 
 Once this is done, the commands are to be run on first worker instance: <code>worker-1</code>. Login to first worker instance using SSH Terminal.</p>
@@ -713,36 +715,36 @@ Once this is done, the commands are to be run on first worker instance: <code>wo
 <p>Kubernetes uses a <a href="https://kubernetes.io/docs/admin/authorization/node/">special-purpose authorization mode</a> called Node Authorizer, that specifically authorizes API requests made by <a href="https://kubernetes.io/docs/concepts/overview/components/#kubelet">Kubelets</a>. In order to be authorized by the Node Authorizer, Kubelets must use a credential that identifies them as being in the <code>system:nodes</code> group, with a username of <code>system:node:&lt;nodeName&gt;</code>. In this section you will create a certificate for each Kubernetes worker node that meets the Node Authorizer requirements.</p>
 <p>Generate a certificate and private key for one worker node:</p>
 <p>On master-1:</p>
-<pre><code>master-1$ cat &gt; openssl-worker-1.cnf &lt;&lt;EOF
-[req]
-req_extensions = v3_req
-distinguished_name = req_distinguished_name
-[req_distinguished_name]
-[ v3_req ]
-basicConstraints = CA:FALSE
-keyUsage = nonRepudiation, digitalSignature, keyEncipherment
-subjectAltName = @alt_names
-[alt_names]
-DNS.1 = worker-1
-IP.1 = 192.168.5.21
-EOF
+<div class="highlight"><pre><span></span><code>master-1$ cat &gt; openssl-worker-1.cnf <span class="s">&lt;&lt;EOF</span>
+<span class="s">[req]</span>
+<span class="s">req_extensions = v3_req</span>
+<span class="s">distinguished_name = req_distinguished_name</span>
+<span class="s">[req_distinguished_name]</span>
+<span class="s">[ v3_req ]</span>
+<span class="s">basicConstraints = CA:FALSE</span>
+<span class="s">keyUsage = nonRepudiation, digitalSignature, keyEncipherment</span>
+<span class="s">subjectAltName = @alt_names</span>
+<span class="s">[alt_names]</span>
+<span class="s">DNS.1 = worker-1</span>
+<span class="s">IP.1 = 192.168.5.21</span>
+<span class="s">EOF</span>
 
-openssl genrsa -out worker-1.key 2048
-openssl req -new -key worker-1.key -subj &quot;/CN=system:node:worker-1/O=system:nodes&quot; -out worker-1.csr -config openssl-worker-1.cnf
-openssl x509 -req -in worker-1.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out worker-1.crt -extensions v3_req -extfile openssl-worker-1.cnf -days 1000
-</code></pre>
+openssl genrsa -out worker-1.key <span class="m">2048</span>
+openssl req -new -key worker-1.key -subj <span class="s2">&quot;/CN=system:node:worker-1/O=system:nodes&quot;</span> -out worker-1.csr -config openssl-worker-1.cnf
+openssl x509 -req -in worker-1.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out worker-1.crt -extensions v3_req -extfile openssl-worker-1.cnf -days <span class="m">1000</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>worker-1.key
+<div class="highlight"><pre><span></span><code>worker-1.key
 worker-1.crt
-</code></pre>
+</code></pre></div>
 <h3 id="the-kubelet-kubernetes-configuration-file">The kubelet Kubernetes Configuration File</h3>
 <p>When generating kubeconfig files for Kubelets the client certificate matching the Kubelet's node name must be used. This will ensure Kubelets are properly authorized by the Kubernetes <a href="https://kubernetes.io/docs/admin/authorization/node/">Node Authorizer</a>.</p>
-<p>Get the kub-api server load-balancer IP.</p>
-<pre><code>LOADBALANCER_ADDRESS=192.168.5.30
-</code></pre>
+<p>Get the kub-api server load-balancer IP.
+<div class="highlight"><pre><span></span><code>LOADBALANCER_ADDRESS=192.168.5.30
+</code></pre></div></p>
 <p>Generate a kubeconfig file for the first worker node.</p>
-<p>On master-1:</p>
-<pre><code>{
+<p>On master-1:
+<div class="highlight"><pre><span></span><code>{
   kubectl config set-cluster kubernetes-the-hard-way \
     --certificate-authority=ca.crt \
     --embed-certs=true \
@@ -762,146 +764,146 @@ worker-1.crt
 
   kubectl config use-context default --kubeconfig=worker-1.kubeconfig
 }
-</code></pre>
+</code></pre></div></p>
 <p>Results:</p>
-<pre><code>worker-1.kubeconfig
-</code></pre>
+<div class="highlight"><pre><span></span><code>worker-1.kubeconfig
+</code></pre></div>
 <h3 id="copy-certificates-private-keys-and-kubeconfig-files-to-the-worker-node">Copy certificates, private keys and kubeconfig files to the worker node:</h3>
-<p>On master-1:</p>
-<pre><code>master-1$ scp ca.crt worker-1.crt worker-1.key worker-1.kubeconfig worker-1:~/
-</code></pre>
+<p>On master-1:
+<div class="highlight"><pre><span></span><code>master-1$ scp ca.crt worker-1.crt worker-1.key worker-1.kubeconfig worker-1:~/
+</code></pre></div></p>
 <h3 id="download-and-install-worker-binaries">Download and Install Worker Binaries</h3>
 <p>Going forward all activities are to be done on the <code>worker-1</code> node.</p>
-<p>On worker-1:</p>
-<pre><code>worker-1$ wget -q --show-progress --https-only --timestamping \
+<p>On worker-1:
+<div class="highlight"><pre><span></span><code>worker-1$ wget -q --show-progress --https-only --timestamping \
   https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl \
   https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-proxy \
   https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubelet
-</code></pre>
+</code></pre></div></p>
 <p>Reference: https://kubernetes.io/docs/setup/release/#node-binaries</p>
 <p>Create the installation directories:</p>
-<pre><code>worker-1$ sudo mkdir -p \
-  /etc/cni/net.d \
-  /opt/cni/bin \
-  /var/lib/kubelet \
-  /var/lib/kube-proxy \
-  /var/lib/kubernetes \
+<div class="highlight"><pre><span></span><code>worker-1$ sudo mkdir -p <span class="se">\</span>
+  /etc/cni/net.d <span class="se">\</span>
+  /opt/cni/bin <span class="se">\</span>
+  /var/lib/kubelet <span class="se">\</span>
+  /var/lib/kube-proxy <span class="se">\</span>
+  /var/lib/kubernetes <span class="se">\</span>
   /var/run/kubernetes
-</code></pre>
+</code></pre></div>
 <p>Install the worker binaries:</p>
-<pre><code>{
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
   chmod +x kubectl kube-proxy kubelet
   sudo mv kubectl kube-proxy kubelet /usr/local/bin/
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <h3 id="configure-the-kubelet">Configure the Kubelet</h3>
-<p>On worker-1:</p>
-<pre><code>{
+<p>On worker-1:
+<div class="highlight"><pre><span></span><code>{
   sudo mv ${HOSTNAME}.key ${HOSTNAME}.crt /var/lib/kubelet/
   sudo mv ${HOSTNAME}.kubeconfig /var/lib/kubelet/kubeconfig
   sudo mv ca.crt /var/lib/kubernetes/
 }
-</code></pre>
+</code></pre></div></p>
 <p>Create the <code>kubelet-config.yaml</code> configuration file:</p>
-<pre><code>worker-1$ cat &lt;&lt;EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml
-kind: KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1beta1
-authentication:
-  anonymous:
-    enabled: false
-  webhook:
-    enabled: true
-  x509:
-    clientCAFile: &quot;/var/lib/kubernetes/ca.crt&quot;
-authorization:
-  mode: Webhook
-clusterDomain: &quot;cluster.local&quot;
-clusterDNS:
-  - &quot;10.96.0.10&quot;
-resolvConf: &quot;/run/systemd/resolve/resolv.conf&quot;
-runtimeRequestTimeout: &quot;15m&quot;
-EOF
-</code></pre>
+<div class="highlight"><pre><span></span><code>worker-1$ cat <span class="s">&lt;&lt;EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml</span>
+<span class="s">kind: KubeletConfiguration</span>
+<span class="s">apiVersion: kubelet.config.k8s.io/v1beta1</span>
+<span class="s">authentication:</span>
+<span class="s">  anonymous:</span>
+<span class="s">    enabled: false</span>
+<span class="s">  webhook:</span>
+<span class="s">    enabled: true</span>
+<span class="s">  x509:</span>
+<span class="s">    clientCAFile: &quot;/var/lib/kubernetes/ca.crt&quot;</span>
+<span class="s">authorization:</span>
+<span class="s">  mode: Webhook</span>
+<span class="s">clusterDomain: &quot;cluster.local&quot;</span>
+<span class="s">clusterDNS:</span>
+<span class="s">  - &quot;10.96.0.10&quot;</span>
+<span class="s">resolvConf: &quot;/run/systemd/resolve/resolv.conf&quot;</span>
+<span class="s">runtimeRequestTimeout: &quot;15m&quot;</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <blockquote>
 <p>The <code>resolvConf</code> configuration is used to avoid loops when using CoreDNS for service discovery on systems running <code>systemd-resolved</code>.</p>
 </blockquote>
 <p>Create the <code>kubelet.service</code> systemd unit file:</p>
-<pre><code>worker-1$ cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kubelet.service
-[Unit]
-Description=Kubernetes Kubelet
-Documentation=https://github.com/kubernetes/kubernetes
-After=docker.service
-Requires=docker.service
+<div class="highlight"><pre><span></span><code>worker-1$ cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kubelet.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=Kubernetes Kubelet</span>
+<span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
+<span class="s">After=docker.service</span>
+<span class="s">Requires=docker.service</span>
 
-[Service]
-ExecStart=/usr/local/bin/kubelet \\
-  --config=/var/lib/kubelet/kubelet-config.yaml \\
-  --image-pull-progress-deadline=2m \\
-  --kubeconfig=/var/lib/kubelet/kubeconfig \\
-  --tls-cert-file=/var/lib/kubelet/${HOSTNAME}.crt \\
-  --tls-private-key-file=/var/lib/kubelet/${HOSTNAME}.key \\
-  --network-plugin=cni \\
-  --register-node=true \\
-  --v=2
-Restart=on-failure
-RestartSec=5
+<span class="s">[Service]</span>
+<span class="s">ExecStart=/usr/local/bin/kubelet \\</span>
+<span class="s">  --config=/var/lib/kubelet/kubelet-config.yaml \\</span>
+<span class="s">  --image-pull-progress-deadline=2m \\</span>
+<span class="s">  --kubeconfig=/var/lib/kubelet/kubeconfig \\</span>
+<span class="s">  --tls-cert-file=/var/lib/kubelet/${HOSTNAME}.crt \\</span>
+<span class="s">  --tls-private-key-file=/var/lib/kubelet/${HOSTNAME}.key \\</span>
+<span class="s">  --network-plugin=cni \\</span>
+<span class="s">  --register-node=true \\</span>
+<span class="s">  --v=2</span>
+<span class="s">Restart=on-failure</span>
+<span class="s">RestartSec=5</span>
 
-[Install]
-WantedBy=multi-user.target
-EOF
-</code></pre>
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <h3 id="configure-the-kubernetes-proxy">Configure the Kubernetes Proxy</h3>
-<p>On worker-1:</p>
-<pre><code>worker-1$ sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
-</code></pre>
+<p>On worker-1:
+<div class="highlight"><pre><span></span><code>worker-1$ sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
+</code></pre></div></p>
 <p>Create the <code>kube-proxy-config.yaml</code> configuration file:</p>
-<pre><code>worker-1$ cat &lt;&lt;EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml
-kind: KubeProxyConfiguration
-apiVersion: kubeproxy.config.k8s.io/v1alpha1
-clientConnection:
-  kubeconfig: &quot;/var/lib/kube-proxy/kubeconfig&quot;
-mode: &quot;iptables&quot;
-clusterCIDR: &quot;192.168.5.0/24&quot;
-EOF
-</code></pre>
+<div class="highlight"><pre><span></span><code>worker-1$ cat <span class="s">&lt;&lt;EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml</span>
+<span class="s">kind: KubeProxyConfiguration</span>
+<span class="s">apiVersion: kubeproxy.config.k8s.io/v1alpha1</span>
+<span class="s">clientConnection:</span>
+<span class="s">  kubeconfig: &quot;/var/lib/kube-proxy/kubeconfig&quot;</span>
+<span class="s">mode: &quot;iptables&quot;</span>
+<span class="s">clusterCIDR: &quot;192.168.5.0/24&quot;</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <p>Create the <code>kube-proxy.service</code> systemd unit file:</p>
-<pre><code>worker-1$ cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kube-proxy.service
-[Unit]
-Description=Kubernetes Kube Proxy
-Documentation=https://github.com/kubernetes/kubernetes
+<div class="highlight"><pre><span></span><code>worker-1$ cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kube-proxy.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=Kubernetes Kube Proxy</span>
+<span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
 
-[Service]
-ExecStart=/usr/local/bin/kube-proxy \\
-  --config=/var/lib/kube-proxy/kube-proxy-config.yaml
-Restart=on-failure
-RestartSec=5
+<span class="s">[Service]</span>
+<span class="s">ExecStart=/usr/local/bin/kube-proxy \\</span>
+<span class="s">  --config=/var/lib/kube-proxy/kube-proxy-config.yaml</span>
+<span class="s">Restart=on-failure</span>
+<span class="s">RestartSec=5</span>
 
-[Install]
-WantedBy=multi-user.target
-EOF
-</code></pre>
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <h3 id="start-the-worker-services">Start the Worker Services</h3>
-<p>On worker-1:</p>
-<pre><code>{
+<p>On worker-1:
+<div class="highlight"><pre><span></span><code>{
   sudo systemctl daemon-reload
   sudo systemctl enable kubelet kube-proxy
   sudo systemctl start kubelet kube-proxy
 }
-</code></pre>
+</code></pre></div></p>
 <blockquote>
 <p>Remember to run the above commands on worker node: <code>worker-1</code></p>
 </blockquote>
 <h2 id="verification">Verification</h2>
 <p>On master-1:</p>
 <p>List the registered Kubernetes nodes from the master node:</p>
-<pre><code>master-1$ kubectl get nodes --kubeconfig admin.kubeconfig
-</code></pre>
+<div class="highlight"><pre><span></span><code>master-1$ kubectl get nodes --kubeconfig admin.kubeconfig
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>NAME       STATUS     ROLES    AGE   VERSION
+<div class="highlight"><pre><span></span><code>NAME       STATUS     ROLES    AGE   VERSION
 worker-1   NotReady   &lt;none&gt;   93s   v1.13.0
-</code></pre>
+</code></pre></div>
 <blockquote>
 <p>Note: It is OK for the worker node to be in a NotReady state.
   That is because we haven't configured Networking yet.</p>
@@ -964,6 +966,7 @@ worker-1   NotReady   &lt;none&gt;   93s   v1.13.0
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -977,7 +980,7 @@ worker-1   NotReady   &lt;none&gt;   93s   v1.13.0
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

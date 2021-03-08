@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -421,8 +421,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api" class="md-nav__link">
-    Step 1 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API
+  <a href="#step-2-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api" class="md-nav__link">
+    Step 2 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API
   </a>
   
 </li>
@@ -706,8 +706,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api" class="md-nav__link">
-    Step 1 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API
+  <a href="#step-2-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api" class="md-nav__link">
+    Step 2 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API
   </a>
   
 </li>
@@ -800,11 +800,13 @@
                 
                 
                 <h1 id="10-tls-bootstrapping-worker-nodes">10. TLS Bootstrapping Worker Nodes</h1>
-<p>In the previous step we configured a worker node by
-- Creating a set of key pairs for the worker node by ourself
-- Getting them signed by the CA by ourself
-- Creating a kube-config file using this certificate by ourself
-- Everytime the certificate expires we must follow the same process of updating the certificate by ourself</p>
+<p>In the previous step we configured a worker node by</p>
+<ul>
+<li>Creating a set of key pairs for the worker node by ourself</li>
+<li>Getting them signed by the CA by ourself</li>
+<li>Creating a kube-config file using this certificate by ourself</li>
+<li>Everytime the certificate expires we must follow the same process of updating the certificate by ourself</li>
+</ul>
 <p>This is not a practical approach when you have 1000s of nodes in the cluster, and nodes dynamically being added and removed from the cluster.  With TLS boostrapping:</p>
 <ul>
 <li>The Nodes can generate certificate key pairs by themselves</li>
@@ -822,310 +824,328 @@
 <p><strong>kube-apiserver</strong> - Ensure bootstrap token based authentication is enabled on the kube-apiserver.</p>
 <p><code>--enable-bootstrap-token-auth=true</code></p>
 <p><strong>kube-controller-manager</strong> - The certificate requests are signed by the kube-controller-manager ultimately. The kube-controller-manager requires the CA Certificate and Key to perform these operations.</p>
-<pre><code>  --cluster-signing-cert-file=/var/lib/kubernetes/ca.crt \\
-  --cluster-signing-key-file=/var/lib/kubernetes/ca.key
-</code></pre>
+<div class="highlight"><pre><span></span><code>  --cluster-signing-cert-file<span class="o">=</span>/var/lib/kubernetes/ca.crt <span class="se">\\</span>
+  --cluster-signing-key-file<span class="o">=</span>/var/lib/kubernetes/ca.key
+</code></pre></div>
 <blockquote>
 <p>Note: We have already configured these in our setup in this course</p>
 </blockquote>
 <p>Copy the ca certificate to the worker node:</p>
-<pre><code>scp ca.crt worker-2:~/
-</code></pre>
+<div class="highlight"><pre><span></span><code>scp ca.crt worker-2:~/
+</code></pre></div>
 <h2 id="step-1-configure-the-binaries-on-the-worker-node">Step 1 Configure the Binaries on the Worker node</h2>
 <h3 id="download-and-install-worker-binaries">Download and Install Worker Binaries</h3>
-<pre><code>wget -q --show-progress --https-only --timestamping \
-  https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl \
-  https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-proxy \
+<div class="highlight"><pre><span></span><code>wget -q --show-progress --https-only --timestamping <span class="se">\</span>
+  https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl <span class="se">\</span>
+  https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-proxy <span class="se">\</span>
   https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubelet
-</code></pre>
+</code></pre></div>
 <p>Reference: https://kubernetes.io/docs/setup/release/#node-binaries</p>
 <p>Create the installation directories:</p>
-<pre><code>sudo mkdir -p \
-  /etc/cni/net.d \
-  /opt/cni/bin \
-  /var/lib/kubelet \
-  /var/lib/kube-proxy \
-  /var/lib/kubernetes \
+<div class="highlight"><pre><span></span><code>sudo mkdir -p <span class="se">\</span>
+  /etc/cni/net.d <span class="se">\</span>
+  /opt/cni/bin <span class="se">\</span>
+  /var/lib/kubelet <span class="se">\</span>
+  /var/lib/kube-proxy <span class="se">\</span>
+  /var/lib/kubernetes <span class="se">\</span>
   /var/run/kubernetes
-</code></pre>
+</code></pre></div>
 <p>Install the worker binaries:</p>
-<pre><code>{
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
   chmod +x kubectl kube-proxy kubelet
   sudo mv kubectl kube-proxy kubelet /usr/local/bin/
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <h3 id="move-the-ca-certificate">Move the ca certificate</h3>
 <p><code>sudo mv ca.crt /var/lib/kubernetes/</code></p>
-<h2 id="step-1-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api">Step 1 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API</h2>
+<h2 id="step-2-create-the-boostrap-token-to-be-used-by-nodeskubelets-to-invoke-certificate-api">Step 2 Create the Boostrap Token to be used by Nodes(Kubelets) to invoke Certificate API</h2>
 <p>For the workers(kubelet) to access the Certificates API, they need to authenticate to the kubernetes api-server first. For this we create a <a href="https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/">Bootstrap Token</a> to be used by the kubelet</p>
-<p>Bootstrap Tokens take the form of a 6 character token id followed by 16 character token secret separated by a dot. Eg: abcdef.0123456789abcdef. More formally, they must match the regular expression [a-z0-9]{6}.[a-z0-9]{16}</p>
+<p>Bootstrap Tokens take the form of a 6 character token id followed by 16 character token secret separated by a dot. Eg: abcdef.0123456789abcdef. More formally, they must match the regular expression <code>[a-z0-9]{6}\.[a-z0-9]{16}</code></p>
 <p>Bootstrap Tokens are created as a secret in the kube-system namespace.</p>
-<pre><code>cat &gt; bootstrap-token-07401b.yaml &lt;&lt;EOF
-apiVersion: v1
-kind: Secret
-metadata:
-  # Name MUST be of form &quot;bootstrap-token-&lt;token id&gt;&quot;
-  name: bootstrap-token-07401b
-  namespace: kube-system
+<div class="highlight"><pre><span></span><code>cat &gt; bootstrap-token-07401b.yaml <span class="s">&lt;&lt;EOF</span>
+<span class="s">apiVersion: v1</span>
+<span class="s">kind: Secret</span>
+<span class="s">metadata:</span>
+<span class="s">  # Name MUST be of form &quot;bootstrap-token-&lt;token id&gt;&quot;</span>
+<span class="s">  name: bootstrap-token-07401b</span>
+<span class="s">  namespace: kube-system</span>
 
-# Type MUST be 'bootstrap.kubernetes.io/token'
-type: bootstrap.kubernetes.io/token
-stringData:
-  # Human readable description. Optional.
-  description: &quot;The default bootstrap token generated by 'kubeadm init'.&quot;
+<span class="s"># Type MUST be &#39;bootstrap.kubernetes.io/token&#39;</span>
+<span class="s">type: bootstrap.kubernetes.io/token</span>
+<span class="s">stringData:</span>
+<span class="s">  # Human readable description. Optional.</span>
+<span class="s">  description: &quot;The default bootstrap token generated by &#39;kubeadm init&#39;.&quot;</span>
 
-  # Token ID and secret. Required.
-  token-id: 07401b
-  token-secret: f395accd246ae52d
+<span class="s">  # Token ID and secret. Required.</span>
+<span class="s">  token-id: 07401b</span>
+<span class="s">  token-secret: f395accd246ae52d</span>
 
-  # Expiration. Optional.
-  expiration: 2021-03-10T03:22:11Z
+<span class="s">  # Expiration. Optional.</span>
+<span class="s">  expiration: 2021-03-10T03:22:11Z</span>
 
-  # Allowed usages.
-  usage-bootstrap-authentication: &quot;true&quot;
-  usage-bootstrap-signing: &quot;true&quot;
+<span class="s">  # Allowed usages.</span>
+<span class="s">  usage-bootstrap-authentication: &quot;true&quot;</span>
+<span class="s">  usage-bootstrap-signing: &quot;true&quot;</span>
 
-  # Extra groups to authenticate the token as. Must start with &quot;system:bootstrappers:&quot;
-  auth-extra-groups: system:bootstrappers:worker
-EOF
+<span class="s">  # Extra groups to authenticate the token as. Must start with &quot;system:bootstrappers:&quot;</span>
+<span class="s">  auth-extra-groups: system:bootstrappers:worker</span>
+<span class="s">EOF</span>
 
 
 kubectl create -f bootstrap-token-07401b.yaml
-
-</code></pre>
-<p>Things to note:
-- <strong>expiration</strong> - make sure its set to a date in the future.
-- <strong>auth-extra-groups</strong> - this is the group the worker nodes are part of. It must start with "system:bootstrappers:" This group does not exist already. This group is associated with this token.</p>
+</code></pre></div>
+<p>Things to note:</p>
+<ul>
+<li><strong>expiration</strong> - make sure its set to a date in the future.</li>
+<li><strong>auth-extra-groups</strong> - this is the group the worker nodes are part of. It must start with "system:bootstrappers:" This group does not exist already. This group is associated with this token.</li>
+</ul>
 <p>Once this is created the token to be used for authentication is <code>07401b.f395accd246ae52d</code></p>
 <p>Reference: https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/#bootstrap-token-secret-format</p>
 <h2 id="step-2-authorize-workerskubelets-to-create-csr">Step 2 Authorize workers(kubelets) to create CSR</h2>
 <p>Next we associate the group we created before to the system:node-bootstrapper ClusterRole. This ClusterRole gives the group enough permissions to bootstrap the kubelet</p>
-<pre><code>kubectl create clusterrolebinding create-csrs-for-bootstrapping --clusterrole=system:node-bootstrapper --group=system:bootstrappers
+<div class="highlight"><pre><span></span><code>kubectl create clusterrolebinding create-csrs-for-bootstrapping --clusterrole<span class="o">=</span>system:node-bootstrapper --group<span class="o">=</span>system:bootstrappers
 
 --------------- OR ---------------
 
-cat &gt; csrs-for-bootstrapping.yaml &lt;&lt;EOF
-# enable bootstrapping nodes to create CSR
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: create-csrs-for-bootstrapping
-subjects:
-- kind: Group
-  name: system:bootstrappers
-  apiGroup: rbac.authorization.k8s.io
-roleRef:
-  kind: ClusterRole
-  name: system:node-bootstrapper
-  apiGroup: rbac.authorization.k8s.io
-EOF
+cat &gt; csrs-for-bootstrapping.yaml <span class="s">&lt;&lt;EOF</span>
+<span class="s"># enable bootstrapping nodes to create CSR</span>
+<span class="s">kind: ClusterRoleBinding</span>
+<span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<span class="s">metadata:</span>
+<span class="s">  name: create-csrs-for-bootstrapping</span>
+<span class="s">subjects:</span>
+<span class="s">- kind: Group</span>
+<span class="s">  name: system:bootstrappers</span>
+<span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<span class="s">roleRef:</span>
+<span class="s">  kind: ClusterRole</span>
+<span class="s">  name: system:node-bootstrapper</span>
+<span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<span class="s">EOF</span>
 
 
 kubectl create -f csrs-for-bootstrapping.yaml
-
-</code></pre>
-<p>Reference: https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#authorize-kubelet-to-create-csr</p>
+</code></pre></div>
+<p>Reference: </p>
+<ul>
+<li><a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#authorize-kubelet-to-create-csr">https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#authorize-kubelet-to-create-csr</a></li>
+</ul>
 <h2 id="step-3-authorize-workerskubelets-to-approve-csr">Step 3 Authorize workers(kubelets) to approve CSR</h2>
-<pre><code>kubectl create clusterrolebinding auto-approve-csrs-for-group --clusterrole=system:certificates.k8s.io:certificatesigningrequests:nodeclient --group=system:bootstrappers
-
- --------------- OR ---------------
-
-cat &gt; auto-approve-csrs-for-group.yaml &lt;&lt;EOF
-# Approve all CSRs for the group &quot;system:bootstrappers&quot;
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: auto-approve-csrs-for-group
-subjects:
-- kind: Group
-  name: system:bootstrappers
-  apiGroup: rbac.authorization.k8s.io
-roleRef:
-  kind: ClusterRole
-  name: system:certificates.k8s.io:certificatesigningrequests:nodeclient
-  apiGroup: rbac.authorization.k8s.io
-EOF
-
-
-kubectl create -f auto-approve-csrs-for-group.yaml
-</code></pre>
-<p>Reference: https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#approval</p>
-<h2 id="step-3-authorize-workerskubelets-to-auto-renew-certificates-on-expiration">Step 3 Authorize workers(kubelets) to Auto Renew Certificates on expiration</h2>
-<p>We now create the Cluster Role Binding required for the nodes to automatically renew the certificates on expiry. Note that we are NOT using the <strong>system:bootstrappers</strong> group here any more. Since by the renewal period, we believe the node would be bootstrapped and part of the cluster already. All nodes are part of the <strong>system:nodes</strong> group.</p>
-<pre><code>kubectl create clusterrolebinding auto-approve-renewals-for-nodes --clusterrole=system:certificates.k8s.io:certificatesigningrequests:selfnodeclient --group=system:nodes
+<div class="highlight"><pre><span></span><code>kubectl create clusterrolebinding auto-approve-csrs-for-group --clusterrole<span class="o">=</span>system:certificates.k8s.io:certificatesigningrequests:nodeclient --group<span class="o">=</span>system:bootstrappers
 
 --------------- OR ---------------
 
-cat &gt; auto-approve-renewals-for-nodes.yaml &lt;&lt;EOF
-# Approve renewal CSRs for the group &quot;system:nodes&quot;
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: auto-approve-renewals-for-nodes
-subjects:
-- kind: Group
-  name: system:nodes
-  apiGroup: rbac.authorization.k8s.io
-roleRef:
-  kind: ClusterRole
-  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeclient
-  apiGroup: rbac.authorization.k8s.io
-EOF
+
+cat &gt; auto-approve-csrs-for-group.yaml <span class="s">&lt;&lt;EOF</span>
+<span class="s"># Approve all CSRs for the group &quot;system:bootstrappers&quot; </span>
+<span class="s">kind: ClusterRoleBinding</span>
+<span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<span class="s">metadata:</span>
+<span class="s">  name: auto-approve-csrs-for-group</span>
+<span class="s">subjects:</span>
+<span class="s">- kind: Group</span>
+<span class="s">  name: system:bootstrappers</span>
+<span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<span class="s">roleRef:</span>
+<span class="s">  kind: ClusterRole</span>
+<span class="s">  name: system:certificates.k8s.io:certificatesigningrequests:nodeclient</span>
+<span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<span class="s">EOF</span>
+
+
+kubectl create -f auto-approve-csrs-for-group.yaml
+</code></pre></div>
+<p>Reference: </p>
+<ul>
+<li><a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#approval">https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#approval</a></li>
+</ul>
+<h2 id="step-3-authorize-workerskubelets-to-auto-renew-certificates-on-expiration">Step 3 Authorize workers(kubelets) to Auto Renew Certificates on expiration</h2>
+<p>We now create the Cluster Role Binding required for the nodes to automatically renew the certificates on expiry. Note that we are NOT using the <strong>system:bootstrappers</strong> group here any more. Since by the renewal period, we believe the node would be bootstrapped and part of the cluster already. All nodes are part of the <strong>system:nodes</strong> group.</p>
+<div class="highlight"><pre><span></span><code>kubectl create clusterrolebinding auto-approve-renewals-for-nodes --clusterrole<span class="o">=</span>system:certificates.k8s.io:certificatesigningrequests:selfnodeclient --group<span class="o">=</span>system:nodes
+
+--------------- OR ---------------
+
+cat &gt; auto-approve-renewals-for-nodes.yaml <span class="s">&lt;&lt;EOF</span>
+<span class="s"># Approve renewal CSRs for the group &quot;system:nodes&quot;</span>
+<span class="s">kind: ClusterRoleBinding</span>
+<span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<span class="s">metadata:</span>
+<span class="s">  name: auto-approve-renewals-for-nodes</span>
+<span class="s">subjects:</span>
+<span class="s">- kind: Group</span>
+<span class="s">  name: system:nodes</span>
+<span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<span class="s">roleRef:</span>
+<span class="s">  kind: ClusterRole</span>
+<span class="s">  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeclient</span>
+<span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<span class="s">EOF</span>
 
 
 kubectl create -f auto-approve-renewals-for-nodes.yaml
-</code></pre>
-<p>Reference: https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#approval</p>
+</code></pre></div>
+<p>Reference: </p>
+<ul>
+<li><a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#approval">https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#approval</a></li>
+</ul>
 <h2 id="step-4-configure-kubelet-to-tls-bootstrap">Step 4 Configure Kubelet to TLS Bootstrap</h2>
 <p>It is now time to configure the second worker to TLS bootstrap using the token we generated</p>
 <p>For worker-1 we started by creating a kubeconfig file with the TLS certificates that we manually generated.
 Here, we don't have the certificates yet. So we cannot create a kubeconfig file. Instead we create a bootstrap-kubeconfig file with information about the token we created.</p>
 <p>This is to be done on the <code>worker-2</code> node.</p>
-<pre><code>sudo kubectl config --kubeconfig=/var/lib/kubelet/bootstrap-kubeconfig set-cluster bootstrap --server='https://192.168.5.30:6443' --certificate-authority=/var/lib/kubernetes/ca.crt
-sudo kubectl config --kubeconfig=/var/lib/kubelet/bootstrap-kubeconfig set-credentials kubelet-bootstrap --token=07401b.f395accd246ae52d
-sudo kubectl config --kubeconfig=/var/lib/kubelet/bootstrap-kubeconfig set-context bootstrap --user=kubelet-bootstrap --cluster=bootstrap
-sudo kubectl config --kubeconfig=/var/lib/kubelet/bootstrap-kubeconfig use-context bootstrap
-</code></pre>
+<div class="highlight"><pre><span></span><code>sudo kubectl config --kubeconfig<span class="o">=</span>/var/lib/kubelet/bootstrap-kubeconfig set-cluster bootstrap --server<span class="o">=</span><span class="s1">&#39;https://192.168.5.30:6443&#39;</span> --certificate-authority<span class="o">=</span>/var/lib/kubernetes/ca.crt
+sudo kubectl config --kubeconfig<span class="o">=</span>/var/lib/kubelet/bootstrap-kubeconfig set-credentials kubelet-bootstrap --token<span class="o">=</span>07401b.f395accd246ae52d
+sudo kubectl config --kubeconfig<span class="o">=</span>/var/lib/kubelet/bootstrap-kubeconfig set-context bootstrap --user<span class="o">=</span>kubelet-bootstrap --cluster<span class="o">=</span>bootstrap
+sudo kubectl config --kubeconfig<span class="o">=</span>/var/lib/kubelet/bootstrap-kubeconfig use-context bootstrap
+</code></pre></div>
 <p>Or</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /var/lib/kubelet/bootstrap-kubeconfig
-apiVersion: v1
-clusters:
-- cluster:
-    certificate-authority: /var/lib/kubernetes/ca.crt
-    server: https://192.168.5.30:6443
-  name: bootstrap
-contexts:
-- context:
-    cluster: bootstrap
-    user: kubelet-bootstrap
-  name: bootstrap
-current-context: bootstrap
-kind: Config
-preferences: {}
-users:
-- name: kubelet-bootstrap
-  user:
-    token: 07401b.f395accd246ae52d
-EOF
-</code></pre>
-<p>Reference: https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubelet-configuration</p>
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /var/lib/kubelet/bootstrap-kubeconfig</span>
+<span class="s">apiVersion: v1</span>
+<span class="s">clusters:</span>
+<span class="s">- cluster:</span>
+<span class="s">    certificate-authority: /var/lib/kubernetes/ca.crt</span>
+<span class="s">    server: https://192.168.5.30:6443</span>
+<span class="s">  name: bootstrap</span>
+<span class="s">contexts:</span>
+<span class="s">- context:</span>
+<span class="s">    cluster: bootstrap</span>
+<span class="s">    user: kubelet-bootstrap</span>
+<span class="s">  name: bootstrap</span>
+<span class="s">current-context: bootstrap</span>
+<span class="s">kind: Config</span>
+<span class="s">preferences: {}</span>
+<span class="s">users:</span>
+<span class="s">- name: kubelet-bootstrap</span>
+<span class="s">  user:</span>
+<span class="s">    token: 07401b.f395accd246ae52d</span>
+<span class="s">EOF</span>
+</code></pre></div>
+<p>Reference: </p>
+<ul>
+<li><a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubelet-configuration">https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubelet-configuration</a></li>
+</ul>
 <h2 id="step-5-create-kubelet-config-file">Step 5 Create Kubelet Config File</h2>
 <p>Create the <code>kubelet-config.yaml</code> configuration file:</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml
-kind: KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1beta1
-authentication:
-  anonymous:
-    enabled: false
-  webhook:
-    enabled: true
-  x509:
-    clientCAFile: &quot;/var/lib/kubernetes/ca.crt&quot;
-authorization:
-  mode: Webhook
-clusterDomain: &quot;cluster.local&quot;
-clusterDNS:
-  - &quot;10.96.0.10&quot;
-resolvConf: &quot;/run/systemd/resolve/resolv.conf&quot;
-runtimeRequestTimeout: &quot;15m&quot;
-EOF
-</code></pre>
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml</span>
+<span class="s">kind: KubeletConfiguration</span>
+<span class="s">apiVersion: kubelet.config.k8s.io/v1beta1</span>
+<span class="s">authentication:</span>
+<span class="s">  anonymous:</span>
+<span class="s">    enabled: false</span>
+<span class="s">  webhook:</span>
+<span class="s">    enabled: true</span>
+<span class="s">  x509:</span>
+<span class="s">    clientCAFile: &quot;/var/lib/kubernetes/ca.crt&quot;</span>
+<span class="s">authorization:</span>
+<span class="s">  mode: Webhook</span>
+<span class="s">clusterDomain: &quot;cluster.local&quot;</span>
+<span class="s">clusterDNS:</span>
+<span class="s">  - &quot;10.96.0.10&quot;</span>
+<span class="s">resolvConf: &quot;/run/systemd/resolve/resolv.conf&quot;</span>
+<span class="s">runtimeRequestTimeout: &quot;15m&quot;</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <blockquote>
 <p>Note: We are not specifying the certificate details - tlsCertFile and tlsPrivateKeyFile - in this file</p>
 </blockquote>
 <h2 id="step-6-configure-kubelet-service">Step 6 Configure Kubelet Service</h2>
 <p>Create the <code>kubelet.service</code> systemd unit file:</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kubelet.service
-[Unit]
-Description=Kubernetes Kubelet
-Documentation=https://github.com/kubernetes/kubernetes
-After=docker.service
-Requires=docker.service
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kubelet.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=Kubernetes Kubelet</span>
+<span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
+<span class="s">After=docker.service</span>
+<span class="s">Requires=docker.service</span>
 
-[Service]
-ExecStart=/usr/local/bin/kubelet \\
-  --bootstrap-kubeconfig=&quot;/var/lib/kubelet/bootstrap-kubeconfig&quot; \\
-  --config=/var/lib/kubelet/kubelet-config.yaml \\
-  --image-pull-progress-deadline=2m \\
-  --kubeconfig=/var/lib/kubelet/kubeconfig \\
-  --cert-dir=/var/lib/kubelet/pki/ \\
-  --rotate-certificates=true \\
-  --rotate-server-certificates=true \\
-  --network-plugin=cni \\
-  --register-node=true \\
-  --v=2
-Restart=on-failure
-RestartSec=5
+<span class="s">[Service]</span>
+<span class="s">ExecStart=/usr/local/bin/kubelet \\</span>
+<span class="s">  --bootstrap-kubeconfig=&quot;/var/lib/kubelet/bootstrap-kubeconfig&quot; \\</span>
+<span class="s">  --config=/var/lib/kubelet/kubelet-config.yaml \\</span>
+<span class="s">  --image-pull-progress-deadline=2m \\</span>
+<span class="s">  --kubeconfig=/var/lib/kubelet/kubeconfig \\</span>
+<span class="s">  --cert-dir=/var/lib/kubelet/pki/ \\</span>
+<span class="s">  --rotate-certificates=true \\</span>
+<span class="s">  --rotate-server-certificates=true \\</span>
+<span class="s">  --network-plugin=cni \\</span>
+<span class="s">  --register-node=true \\</span>
+<span class="s">  --v=2</span>
+<span class="s">Restart=on-failure</span>
+<span class="s">RestartSec=5</span>
 
-[Install]
-WantedBy=multi-user.target
-EOF
-</code></pre>
-<p>Things to note here:
-- <strong>bootstrap-kubeconfig</strong>: Location of the bootstrap-kubeconfig file.
-- <strong>cert-dir</strong>: The directory where the generated certificates are stored.
-- <strong>rotate-certificates</strong>: Rotates client certificates when they expire.
-- <strong>rotate-server-certificates</strong>: Requests for server certificates on bootstrap and rotates them when they expire.</p>
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</code></pre></div>
+<p>Things to note here:</p>
+<ul>
+<li><strong>bootstrap-kubeconfig</strong>: Location of the bootstrap-kubeconfig file.</li>
+<li><strong>cert-dir</strong>: The directory where the generated certificates are stored.</li>
+<li><strong>rotate-certificates</strong>: Rotates client certificates when they expire.</li>
+<li><strong>rotate-server-certificates</strong>: Requests for server certificates on bootstrap and rotates them when they expire.</li>
+</ul>
 <h2 id="step-7-configure-the-kubernetes-proxy">Step 7 Configure the Kubernetes Proxy</h2>
-<p>In one of the previous steps we created the kube-proxy.kubeconfig file. Check <a href="https://github.com/mmumshad/kubernetes-the-hard-way/blob/master/docs/05-kubernetes-configuration-files.md">here</a> if you missed it.</p>
-<pre><code>sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
-</code></pre>
+<p>In one of the previous steps we created the <code>kube-proxy.kubeconfig</code> file. Check <a href="../05-kubernetes-configuration-files/">here</a> if you missed it.</p>
+<div class="highlight"><pre><span></span><code>sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
+</code></pre></div>
 <p>Create the <code>kube-proxy-config.yaml</code> configuration file:</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml
-kind: KubeProxyConfiguration
-apiVersion: kubeproxy.config.k8s.io/v1alpha1
-clientConnection:
-  kubeconfig: &quot;/var/lib/kube-proxy/kubeconfig&quot;
-mode: &quot;iptables&quot;
-clusterCIDR: &quot;192.168.5.0/24&quot;
-EOF
-</code></pre>
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml</span>
+<span class="s">kind: KubeProxyConfiguration</span>
+<span class="s">apiVersion: kubeproxy.config.k8s.io/v1alpha1</span>
+<span class="s">clientConnection:</span>
+<span class="s">  kubeconfig: &quot;/var/lib/kube-proxy/kubeconfig&quot;</span>
+<span class="s">mode: &quot;iptables&quot;</span>
+<span class="s">clusterCIDR: &quot;192.168.5.0/24&quot;</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <p>Create the <code>kube-proxy.service</code> systemd unit file:</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kube-proxy.service
-[Unit]
-Description=Kubernetes Kube Proxy
-Documentation=https://github.com/kubernetes/kubernetes
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kube-proxy.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=Kubernetes Kube Proxy</span>
+<span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
 
-[Service]
-ExecStart=/usr/local/bin/kube-proxy \\
-  --config=/var/lib/kube-proxy/kube-proxy-config.yaml
-Restart=on-failure
-RestartSec=5
+<span class="s">[Service]</span>
+<span class="s">ExecStart=/usr/local/bin/kube-proxy \\</span>
+<span class="s">  --config=/var/lib/kube-proxy/kube-proxy-config.yaml</span>
+<span class="s">Restart=on-failure</span>
+<span class="s">RestartSec=5</span>
 
-[Install]
-WantedBy=multi-user.target
-EOF
-</code></pre>
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <h2 id="step-8-start-the-worker-services">Step 8 Start the Worker Services</h2>
-<pre><code>{
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
   sudo systemctl daemon-reload
-  sudo systemctl enable kubelet kube-proxy
+  sudo systemctl <span class="nb">enable</span> kubelet kube-proxy
   sudo systemctl start kubelet kube-proxy
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <blockquote>
 <p>Remember to run the above commands on worker node: <code>worker-2</code></p>
 </blockquote>
 <h2 id="step-9-approve-server-csr">Step 9 Approve Server CSR</h2>
 <p><code>kubectl get csr</code></p>
-<pre><code>NAME                                                   AGE   REQUESTOR                 CONDITION
+<div class="highlight"><pre><span></span><code>NAME                                                   AGE   REQUESTOR                 CONDITION
 csr-95bv6                                              20s   system:node:worker-2      Pending
-</code></pre>
+</code></pre></div>
 <p>Approve</p>
 <p><code>kubectl certificate approve csr-95bv6</code></p>
-<p>Reference: https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubectl-approval</p>
+<p>Reference: </p>
+<ul>
+<li><a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubectl-approval">https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubectl-approval</a></li>
+</ul>
 <h2 id="verification">Verification</h2>
 <p>List the registered Kubernetes nodes from the master node:</p>
-<pre><code>master-1$ kubectl get nodes --kubeconfig admin.kubeconfig
-</code></pre>
+<div class="highlight"><pre><span></span><code>master-1$ kubectl get nodes --kubeconfig admin.kubeconfig
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>NAME       STATUS   ROLES    AGE   VERSION
+<p><div class="highlight"><pre><span></span><code>NAME       STATUS   ROLES    AGE   VERSION
 worker-1   NotReady   &lt;none&gt;   93s   v1.13.0
 worker-2   NotReady   &lt;none&gt;   93s   v1.13.0
-</code></pre>
-<p>Note: It is OK for the worker node to be in a NotReady state. That is because we haven't configured Networking yet.</p>
+</code></pre></div>
+Note: It is OK for the worker node to be in a NotReady state. That is because we haven't configured Networking yet.</p>
 <p>Next: <a href="../11-configuring-kubectl/">Configuring Kubectl</a></p>
                 
               
@@ -1183,6 +1203,7 @@ worker-2   NotReady   &lt;none&gt;   93s   v1.13.0
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -1196,7 +1217,7 @@ worker-2   NotReady   &lt;none&gt;   93s   v1.13.0
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

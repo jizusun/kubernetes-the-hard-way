@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -599,49 +599,49 @@
 <h2 id="the-admin-kubernetes-configuration-file">The Admin Kubernetes Configuration File</h2>
 <p>Each kubeconfig requires a Kubernetes API Server to connect to. To support high availability the IP address assigned to the external load balancer fronting the Kubernetes API Servers will be used.</p>
 <p>Generate a kubeconfig file suitable for authenticating as the <code>admin</code> user:</p>
-<pre><code>{
-  KUBERNETES_LB_ADDRESS=192.168.5.30
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
+  <span class="nv">KUBERNETES_LB_ADDRESS</span><span class="o">=</span><span class="m">192</span>.168.5.30
 
-  kubectl config set-cluster kubernetes-the-hard-way \
-    --certificate-authority=ca.crt \
-    --embed-certs=true \
-    --server=https://${KUBERNETES_LB_ADDRESS}:6443
+  kubectl config set-cluster kubernetes-the-hard-way <span class="se">\</span>
+    --certificate-authority<span class="o">=</span>ca.crt <span class="se">\</span>
+    --embed-certs<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    --server<span class="o">=</span>https://<span class="si">${</span><span class="nv">KUBERNETES_LB_ADDRESS</span><span class="si">}</span>:6443
 
-  kubectl config set-credentials admin \
-    --client-certificate=admin.crt \
-    --client-key=admin.key
+  kubectl config set-credentials admin <span class="se">\</span>
+    --client-certificate<span class="o">=</span>admin.crt <span class="se">\</span>
+    --client-key<span class="o">=</span>admin.key
 
-  kubectl config set-context kubernetes-the-hard-way \
-    --cluster=kubernetes-the-hard-way \
-    --user=admin
+  kubectl config set-context kubernetes-the-hard-way <span class="se">\</span>
+    --cluster<span class="o">=</span>kubernetes-the-hard-way <span class="se">\</span>
+    --user<span class="o">=</span>admin
 
   kubectl config use-context kubernetes-the-hard-way
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <p>Reference doc for kubectl config <a href="https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/">here</a></p>
 <h2 id="verification">Verification</h2>
 <p>Check the health of the remote Kubernetes cluster:</p>
-<pre><code>kubectl get componentstatuses
-</code></pre>
+<div class="highlight"><pre><span></span><code>kubectl get componentstatuses
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>NAME                 STATUS    MESSAGE             ERROR
+<div class="highlight"><pre><span></span><code>NAME                 STATUS    MESSAGE             ERROR
 controller-manager   Healthy   ok
 scheduler            Healthy   ok
-etcd-1               Healthy   {&quot;health&quot;:&quot;true&quot;}
-etcd-0               Healthy   {&quot;health&quot;:&quot;true&quot;}
-</code></pre>
+etcd-1               Healthy   <span class="o">{</span><span class="s2">&quot;health&quot;</span>:<span class="s2">&quot;true&quot;</span><span class="o">}</span>
+etcd-0               Healthy   <span class="o">{</span><span class="s2">&quot;health&quot;</span>:<span class="s2">&quot;true&quot;</span><span class="o">}</span>
+</code></pre></div>
 <p>List the nodes in the remote Kubernetes cluster:</p>
-<pre><code>kubectl get nodes
-</code></pre>
+<div class="highlight"><pre><span></span><code>kubectl get nodes
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>NAME       STATUS   ROLES    AGE    VERSION
+<div class="highlight"><pre><span></span><code>NAME       STATUS   ROLES    AGE    VERSION
 worker-1   NotReady    &lt;none&gt;   118s   v1.13.0
 worker-2   NotReady    &lt;none&gt;   118s   v1.13.0
-</code></pre>
+</code></pre></div>
 <p>Note: It is OK for the worker node to be in a <code>NotReady</code> state. Worker nodes will come into <code>Ready</code> state once networking is configured.</p>
 <p>Next: <a href="../12-configure-pod-networking/">Deploy Pod Networking</a></p>
                 
@@ -700,6 +700,7 @@ worker-2   NotReady    &lt;none&gt;   118s   v1.13.0
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -713,7 +714,7 @@ worker-2   NotReady    &lt;none&gt;   118s   v1.13.0
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -593,30 +593,29 @@
                 
                 <h1 id="16-run-end-to-end-tests">16. Run End-to-End Tests</h1>
 <p>Install Go</p>
-<pre><code>wget https://dl.google.com/go/go1.12.1.linux-amd64.tar.gz
+<div class="highlight"><pre><span></span><code>wget https://dl.google.com/go/go1.12.1.linux-amd64.tar.gz
 
 sudo tar -C /usr/local -xzf go1.12.1.linux-amd64.tar.gz
-export GOPATH=&quot;/home/vagrant/go&quot;
-export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
-</code></pre>
+<span class="nb">export</span> <span class="nv">GOPATH</span><span class="o">=</span><span class="s2">&quot;/home/vagrant/go&quot;</span>
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/usr/local/go/bin:<span class="nv">$GOPATH</span>/bin
+</code></pre></div>
 <h2 id="install-kubetest">Install kubetest</h2>
-<pre><code>git clone https://github.com/kubernetes/test-infra.git
-cd test-infra/
-GO111MODULE=on go install ./kubetest
-</code></pre>
+<div class="highlight"><pre><span></span><code>git clone https://github.com/kubernetes/test-infra.git
+<span class="nb">cd</span> test-infra/
+<span class="nv">GO111MODULE</span><span class="o">=</span>on go install ./kubetest
+</code></pre></div>
 <blockquote>
 <p>Note: This may take a few minutes depending on your network speed</p>
 </blockquote>
 <h2 id="use-the-version-specific-to-your-cluster">Use the version specific to your cluster</h2>
-<pre><code>K8S_VERSION=$(kubectl version -o json | jq -r '.serverVersion.gitVersion')
-export KUBERNETES_CONFORMANCE_TEST=y
-export KUBECONFIG=&quot;$HOME/.kube/config&quot;
+<div class="highlight"><pre><span></span><code><span class="nv">K8S_VERSION</span><span class="o">=</span><span class="k">$(</span>kubectl version -o json <span class="p">|</span> jq -r <span class="s1">&#39;.serverVersion.gitVersion&#39;</span><span class="k">)</span>
+<span class="nb">export</span> <span class="nv">KUBERNETES_CONFORMANCE_TEST</span><span class="o">=</span>y
+<span class="nb">export</span> <span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.kube/config&quot;</span>
 
 
 
-kubetest --provider=skeleton --test --test_args=”--ginkgo.focus=\[Conformance\]” --extract ${K8S_VERSION} | tee test.out
-
-</code></pre>
+kubetest --provider<span class="o">=</span>skeleton --test --test_args<span class="o">=</span>”--ginkgo.focus<span class="o">=</span><span class="se">\[</span>Conformance<span class="se">\]</span>” --extract <span class="si">${</span><span class="nv">K8S_VERSION</span><span class="si">}</span> <span class="p">|</span> tee test.out
+</code></pre></div>
 <p>This could take about 1.5 to 2 hours. The number of tests run and passed will be displayed at the end.</p>
                 
               
@@ -674,6 +673,7 @@ kubetest --provider=skeleton --test --test_args=”--ginkgo.focus=\[Conformance\
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -687,7 +687,7 @@ kubetest --provider=skeleton --test --test_args=”--ginkgo.focus=\[Conformance\
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

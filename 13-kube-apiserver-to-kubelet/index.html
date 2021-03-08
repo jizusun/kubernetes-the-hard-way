@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -584,48 +584,54 @@
 <p>This tutorial sets the Kubelet <code>--authorization-mode</code> flag to <code>Webhook</code>. Webhook mode uses the <a href="https://kubernetes.io/docs/admin/authorization/#checking-api-access">SubjectAccessReview</a> API to determine authorization.</p>
 </blockquote>
 <p>Create the <code>system:kube-apiserver-to-kubelet</code> <a href="https://kubernetes.io/docs/admin/authorization/rbac/#role-and-clusterrole">ClusterRole</a> with permissions to access the Kubelet API and perform most common tasks associated with managing pods:</p>
-<pre><code>cat &lt;&lt;EOF | kubectl apply --kubeconfig admin.kubeconfig -f -
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: &quot;true&quot;
-  labels:
-    kubernetes.io/bootstrapping: rbac-defaults
-  name: system:kube-apiserver-to-kubelet
-rules:
-  - apiGroups:
-      - &quot;&quot;
-    resources:
-      - nodes/proxy
-      - nodes/stats
-      - nodes/log
-      - nodes/spec
-      - nodes/metrics
-    verbs:
-      - &quot;*&quot;
-EOF
-</code></pre>
-<p>Reference: https://v1-12.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole</p>
+<p><div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | kubectl apply --kubeconfig admin.kubeconfig -f -</span>
+<span class="s">apiVersion: rbac.authorization.k8s.io/v1beta1</span>
+<span class="s">kind: ClusterRole</span>
+<span class="s">metadata:</span>
+<span class="s">  annotations:</span>
+<span class="s">    rbac.authorization.kubernetes.io/autoupdate: &quot;true&quot;</span>
+<span class="s">  labels:</span>
+<span class="s">    kubernetes.io/bootstrapping: rbac-defaults</span>
+<span class="s">  name: system:kube-apiserver-to-kubelet</span>
+<span class="s">rules:</span>
+<span class="s">  - apiGroups:</span>
+<span class="s">      - &quot;&quot;</span>
+<span class="s">    resources:</span>
+<span class="s">      - nodes/proxy</span>
+<span class="s">      - nodes/stats</span>
+<span class="s">      - nodes/log</span>
+<span class="s">      - nodes/spec</span>
+<span class="s">      - nodes/metrics</span>
+<span class="s">    verbs:</span>
+<span class="s">      - &quot;*&quot;</span>
+<span class="s">EOF</span>
+</code></pre></div>
+Reference: </p>
+<ul>
+<li><a href="https://v1-12.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole">https://v1-12.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole</a></li>
+</ul>
 <p>The Kubernetes API Server authenticates to the Kubelet as the <code>kubernetes</code> user using the client certificate as defined by the <code>--kubelet-client-certificate</code> flag.</p>
 <p>Bind the <code>system:kube-apiserver-to-kubelet</code> ClusterRole to the <code>kubernetes</code> user:</p>
-<pre><code>cat &lt;&lt;EOF | kubectl apply --kubeconfig admin.kubeconfig -f -
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: system:kube-apiserver
-  namespace: &quot;&quot;
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:kube-apiserver-to-kubelet
-subjects:
-  - apiGroup: rbac.authorization.k8s.io
-    kind: User
-    name: kube-apiserver
-EOF
-</code></pre>
-<p>Reference: https://v1-12.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding</p>
+<p><div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | kubectl apply --kubeconfig admin.kubeconfig -f -</span>
+<span class="s">apiVersion: rbac.authorization.k8s.io/v1beta1</span>
+<span class="s">kind: ClusterRoleBinding</span>
+<span class="s">metadata:</span>
+<span class="s">  name: system:kube-apiserver</span>
+<span class="s">  namespace: &quot;&quot;</span>
+<span class="s">roleRef:</span>
+<span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<span class="s">  kind: ClusterRole</span>
+<span class="s">  name: system:kube-apiserver-to-kubelet</span>
+<span class="s">subjects:</span>
+<span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
+<span class="s">    kind: User</span>
+<span class="s">    name: kube-apiserver</span>
+<span class="s">EOF</span>
+</code></pre></div>
+Reference: </p>
+<ul>
+<li><a href="https://v1-12.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding">https://v1-12.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding</a></li>
+</ul>
 <p>Next: <a href="../14-dns-addon/">DNS Addon</a></p>
                 
               
@@ -683,6 +689,7 @@ EOF
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -696,7 +703,7 @@ EOF
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

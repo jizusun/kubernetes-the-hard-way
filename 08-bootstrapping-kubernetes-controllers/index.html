@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -775,157 +775,157 @@
 <p><a href="https://github.com/tmux/tmux/wiki">tmux</a> can be used to run commands on multiple compute instances at the same time. See the <a href="../01-prerequisites/#running-commands-in-parallel-with-tmux">Running commands in parallel with tmux</a> section in the Prerequisites lab.</p>
 <h2 id="provision-the-kubernetes-control-plane">Provision the Kubernetes Control Plane</h2>
 <p>Create the Kubernetes configuration directory:</p>
-<pre><code>sudo mkdir -p /etc/kubernetes/config
-</code></pre>
+<div class="highlight"><pre><span></span><code>sudo mkdir -p /etc/kubernetes/config
+</code></pre></div>
 <h3 id="download-and-install-the-kubernetes-controller-binaries">Download and Install the Kubernetes Controller Binaries</h3>
 <p>Download the official Kubernetes release binaries:</p>
-<pre><code>wget -q --show-progress --https-only --timestamping \
-  &quot;https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-apiserver&quot; \
-  &quot;https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-controller-manager&quot; \
-  &quot;https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-scheduler&quot; \
-  &quot;https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl&quot;
-</code></pre>
+<div class="highlight"><pre><span></span><code>wget -q --show-progress --https-only --timestamping <span class="se">\</span>
+  <span class="s2">&quot;https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-apiserver&quot;</span> <span class="se">\</span>
+  <span class="s2">&quot;https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-controller-manager&quot;</span> <span class="se">\</span>
+  <span class="s2">&quot;https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-scheduler&quot;</span> <span class="se">\</span>
+  <span class="s2">&quot;https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl&quot;</span>
+</code></pre></div>
 <p>Reference: https://kubernetes.io/docs/setup/release/#server-binaries</p>
 <p>Install the Kubernetes binaries:</p>
-<pre><code>{
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
   chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
   sudo mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <h3 id="configure-the-kubernetes-api-server">Configure the Kubernetes API Server</h3>
-<pre><code>{
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
   sudo mkdir -p /var/lib/kubernetes/
 
-  sudo cp ca.crt ca.key kube-apiserver.crt kube-apiserver.key \
-    service-account.key service-account.crt \
-    etcd-server.key etcd-server.crt \
+  sudo cp ca.crt ca.key kube-apiserver.crt kube-apiserver.key <span class="se">\</span>
+    service-account.key service-account.crt <span class="se">\</span>
+    etcd-server.key etcd-server.crt <span class="se">\</span>
     encryption-config.yaml /var/lib/kubernetes/
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <p>The instance internal IP address will be used to advertise the API Server to members of the cluster. Retrieve the internal IP address for the current compute instance:</p>
-<pre><code>INTERNAL_IP=$(ip addr show enp0s8 | grep &quot;inet &quot; | awk '{print $2}' | cut -d / -f 1)
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nv">INTERNAL_IP</span><span class="o">=</span><span class="k">$(</span>ip addr show enp0s8 <span class="p">|</span> grep <span class="s2">&quot;inet &quot;</span> <span class="p">|</span> awk <span class="s1">&#39;{print $2}&#39;</span> <span class="p">|</span> cut -d / -f <span class="m">1</span><span class="k">)</span>
+</code></pre></div>
 <p>Verify it is set</p>
-<pre><code>echo $INTERNAL_IP
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span> <span class="nv">$INTERNAL_IP</span>
+</code></pre></div>
 <p>Create the <code>kube-apiserver.service</code> systemd unit file:</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kube-apiserver.service
-[Unit]
-Description=Kubernetes API Server
-Documentation=https://github.com/kubernetes/kubernetes
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kube-apiserver.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=Kubernetes API Server</span>
+<span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
 
-[Service]
-ExecStart=/usr/local/bin/kube-apiserver \\
-  --advertise-address=${INTERNAL_IP} \\
-  --allow-privileged=true \\
-  --apiserver-count=3 \\
-  --audit-log-maxage=30 \\
-  --audit-log-maxbackup=3 \\
-  --audit-log-maxsize=100 \\
-  --audit-log-path=/var/log/audit.log \\
-  --authorization-mode=Node,RBAC \\
-  --bind-address=0.0.0.0 \\
-  --client-ca-file=/var/lib/kubernetes/ca.crt \\
-  --enable-admission-plugins=NodeRestriction,ServiceAccount \\
-  --enable-swagger-ui=true \\
-  --enable-bootstrap-token-auth=true \\
-  --etcd-cafile=/var/lib/kubernetes/ca.crt \\
-  --etcd-certfile=/var/lib/kubernetes/etcd-server.crt \\
-  --etcd-keyfile=/var/lib/kubernetes/etcd-server.key \\
-  --etcd-servers=https://192.168.5.11:2379,https://192.168.5.12:2379 \\
-  --event-ttl=1h \\
-  --encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\
-  --kubelet-certificate-authority=/var/lib/kubernetes/ca.crt \\
-  --kubelet-client-certificate=/var/lib/kubernetes/kube-apiserver.crt \\
-  --kubelet-client-key=/var/lib/kubernetes/kube-apiserver.key \\
-  --kubelet-https=true \\
-  --runtime-config=api/all \\
-  --service-account-key-file=/var/lib/kubernetes/service-account.crt \\
-  --service-cluster-ip-range=10.96.0.0/24 \\
-  --service-node-port-range=30000-32767 \\
-  --tls-cert-file=/var/lib/kubernetes/kube-apiserver.crt \\
-  --tls-private-key-file=/var/lib/kubernetes/kube-apiserver.key \\
-  --v=2
-Restart=on-failure
-RestartSec=5
+<span class="s">[Service]</span>
+<span class="s">ExecStart=/usr/local/bin/kube-apiserver \\</span>
+<span class="s">  --advertise-address=${INTERNAL_IP} \\</span>
+<span class="s">  --allow-privileged=true \\</span>
+<span class="s">  --apiserver-count=3 \\</span>
+<span class="s">  --audit-log-maxage=30 \\</span>
+<span class="s">  --audit-log-maxbackup=3 \\</span>
+<span class="s">  --audit-log-maxsize=100 \\</span>
+<span class="s">  --audit-log-path=/var/log/audit.log \\</span>
+<span class="s">  --authorization-mode=Node,RBAC \\</span>
+<span class="s">  --bind-address=0.0.0.0 \\</span>
+<span class="s">  --client-ca-file=/var/lib/kubernetes/ca.crt \\</span>
+<span class="s">  --enable-admission-plugins=NodeRestriction,ServiceAccount \\</span>
+<span class="s">  --enable-swagger-ui=true \\</span>
+<span class="s">  --enable-bootstrap-token-auth=true \\</span>
+<span class="s">  --etcd-cafile=/var/lib/kubernetes/ca.crt \\</span>
+<span class="s">  --etcd-certfile=/var/lib/kubernetes/etcd-server.crt \\</span>
+<span class="s">  --etcd-keyfile=/var/lib/kubernetes/etcd-server.key \\</span>
+<span class="s">  --etcd-servers=https://192.168.5.11:2379,https://192.168.5.12:2379 \\</span>
+<span class="s">  --event-ttl=1h \\</span>
+<span class="s">  --encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\</span>
+<span class="s">  --kubelet-certificate-authority=/var/lib/kubernetes/ca.crt \\</span>
+<span class="s">  --kubelet-client-certificate=/var/lib/kubernetes/kube-apiserver.crt \\</span>
+<span class="s">  --kubelet-client-key=/var/lib/kubernetes/kube-apiserver.key \\</span>
+<span class="s">  --kubelet-https=true \\</span>
+<span class="s">  --runtime-config=api/all \\</span>
+<span class="s">  --service-account-key-file=/var/lib/kubernetes/service-account.crt \\</span>
+<span class="s">  --service-cluster-ip-range=10.96.0.0/24 \\</span>
+<span class="s">  --service-node-port-range=30000-32767 \\</span>
+<span class="s">  --tls-cert-file=/var/lib/kubernetes/kube-apiserver.crt \\</span>
+<span class="s">  --tls-private-key-file=/var/lib/kubernetes/kube-apiserver.key \\</span>
+<span class="s">  --v=2</span>
+<span class="s">Restart=on-failure</span>
+<span class="s">RestartSec=5</span>
 
-[Install]
-WantedBy=multi-user.target
-EOF
-</code></pre>
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <h3 id="configure-the-kubernetes-controller-manager">Configure the Kubernetes Controller Manager</h3>
 <p>Copy the <code>kube-controller-manager</code> kubeconfig into place:</p>
-<pre><code>sudo cp kube-controller-manager.kubeconfig /var/lib/kubernetes/
-</code></pre>
+<div class="highlight"><pre><span></span><code>sudo cp kube-controller-manager.kubeconfig /var/lib/kubernetes/
+</code></pre></div>
 <p>Create the <code>kube-controller-manager.service</code> systemd unit file:</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kube-controller-manager.service
-[Unit]
-Description=Kubernetes Controller Manager
-Documentation=https://github.com/kubernetes/kubernetes
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kube-controller-manager.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=Kubernetes Controller Manager</span>
+<span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
 
-[Service]
-ExecStart=/usr/local/bin/kube-controller-manager \\
-  --address=0.0.0.0 \\
-  --cluster-cidr=192.168.5.0/24 \\
-  --cluster-name=kubernetes \\
-  --cluster-signing-cert-file=/var/lib/kubernetes/ca.crt \\
-  --cluster-signing-key-file=/var/lib/kubernetes/ca.key \\
-  --kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \\
-  --leader-elect=true \\
-  --root-ca-file=/var/lib/kubernetes/ca.crt \\
-  --service-account-private-key-file=/var/lib/kubernetes/service-account.key \\
-  --service-cluster-ip-range=10.96.0.0/24 \\
-  --use-service-account-credentials=true \\
-  --v=2
-Restart=on-failure
-RestartSec=5
+<span class="s">[Service]</span>
+<span class="s">ExecStart=/usr/local/bin/kube-controller-manager \\</span>
+<span class="s">  --address=0.0.0.0 \\</span>
+<span class="s">  --cluster-cidr=192.168.5.0/24 \\</span>
+<span class="s">  --cluster-name=kubernetes \\</span>
+<span class="s">  --cluster-signing-cert-file=/var/lib/kubernetes/ca.crt \\</span>
+<span class="s">  --cluster-signing-key-file=/var/lib/kubernetes/ca.key \\</span>
+<span class="s">  --kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \\</span>
+<span class="s">  --leader-elect=true \\</span>
+<span class="s">  --root-ca-file=/var/lib/kubernetes/ca.crt \\</span>
+<span class="s">  --service-account-private-key-file=/var/lib/kubernetes/service-account.key \\</span>
+<span class="s">  --service-cluster-ip-range=10.96.0.0/24 \\</span>
+<span class="s">  --use-service-account-credentials=true \\</span>
+<span class="s">  --v=2</span>
+<span class="s">Restart=on-failure</span>
+<span class="s">RestartSec=5</span>
 
-[Install]
-WantedBy=multi-user.target
-EOF
-</code></pre>
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <h3 id="configure-the-kubernetes-scheduler">Configure the Kubernetes Scheduler</h3>
 <p>Copy the <code>kube-scheduler</code> kubeconfig into place:</p>
-<pre><code>sudo cp kube-scheduler.kubeconfig /var/lib/kubernetes/
-</code></pre>
+<div class="highlight"><pre><span></span><code>sudo cp kube-scheduler.kubeconfig /var/lib/kubernetes/
+</code></pre></div>
 <p>Create the <code>kube-scheduler.service</code> systemd unit file:</p>
-<pre><code>cat &lt;&lt;EOF | sudo tee /etc/systemd/system/kube-scheduler.service
-[Unit]
-Description=Kubernetes Scheduler
-Documentation=https://github.com/kubernetes/kubernetes
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kube-scheduler.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=Kubernetes Scheduler</span>
+<span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
 
-[Service]
-ExecStart=/usr/local/bin/kube-scheduler \\
-  --kubeconfig=/var/lib/kubernetes/kube-scheduler.kubeconfig \\
-  --address=127.0.0.1 \\
-  --leader-elect=true \\
-  --v=2
-Restart=on-failure
-RestartSec=5
+<span class="s">[Service]</span>
+<span class="s">ExecStart=/usr/local/bin/kube-scheduler \\</span>
+<span class="s">  --kubeconfig=/var/lib/kubernetes/kube-scheduler.kubeconfig \\</span>
+<span class="s">  --address=127.0.0.1 \\</span>
+<span class="s">  --leader-elect=true \\</span>
+<span class="s">  --v=2</span>
+<span class="s">Restart=on-failure</span>
+<span class="s">RestartSec=5</span>
 
-[Install]
-WantedBy=multi-user.target
-EOF
-</code></pre>
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <h3 id="start-the-controller-services">Start the Controller Services</h3>
-<pre><code>{
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
   sudo systemctl daemon-reload
-  sudo systemctl enable kube-apiserver kube-controller-manager kube-scheduler
+  sudo systemctl <span class="nb">enable</span> kube-apiserver kube-controller-manager kube-scheduler
   sudo systemctl start kube-apiserver kube-controller-manager kube-scheduler
-}
-</code></pre>
+<span class="o">}</span>
+</code></pre></div>
 <blockquote>
 <p>Allow up to 10 seconds for the Kubernetes API Server to fully initialize.</p>
 </blockquote>
 <h3 id="verification">Verification</h3>
-<pre><code>kubectl get componentstatuses --kubeconfig admin.kubeconfig
-</code></pre>
-<pre><code>NAME                 STATUS    MESSAGE              ERROR
+<div class="highlight"><pre><span></span><code>kubectl get componentstatuses --kubeconfig admin.kubeconfig
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>NAME                 STATUS    MESSAGE              ERROR
 controller-manager   Healthy   ok
 scheduler            Healthy   ok
-etcd-0               Healthy   {&quot;health&quot;: &quot;true&quot;}
-etcd-1               Healthy   {&quot;health&quot;: &quot;true&quot;}
-</code></pre>
+etcd-0               Healthy   <span class="o">{</span><span class="s2">&quot;health&quot;</span>: <span class="s2">&quot;true&quot;</span><span class="o">}</span>
+etcd-1               Healthy   <span class="o">{</span><span class="s2">&quot;health&quot;</span>: <span class="s2">&quot;true&quot;</span><span class="o">}</span>
+</code></pre></div>
 <blockquote>
 <p>Remember to run the above commands on each controller node: <code>master-1</code>, and <code>master-2</code>.</p>
 </blockquote>
@@ -933,46 +933,48 @@ etcd-1               Healthy   {&quot;health&quot;: &quot;true&quot;}
 <p>In this section you will provision an external load balancer to front the Kubernetes API Servers. The <code>kubernetes-the-hard-way</code> static IP address will be attached to the resulting load balancer.</p>
 <h3 id="provision-a-network-load-balancer">Provision a Network Load Balancer</h3>
 <p>Login to <code>loadbalancer</code> instance using SSH Terminal.</p>
-<pre><code>#Install HAProxy
-loadbalancer# sudo apt-get update &amp;&amp; sudo apt-get install -y haproxy
+<div class="highlight"><pre><span></span><code><span class="c1">#Install HAProxy</span>
+loadbalancer# sudo apt-get update <span class="o">&amp;&amp;</span> sudo apt-get install -y haproxy
 
-</code></pre>
-<pre><code>loadbalancer# cat &lt;&lt;EOF | sudo tee /etc/haproxy/haproxy.cfg 
-frontend kubernetes
-    bind 192.168.5.30:6443
-    option tcplog
-    mode tcp
-    default_backend kubernetes-master-nodes
+<span class="sb">```</span>sh
 
-backend kubernetes-master-nodes
-    mode tcp
-    balance roundrobin
-    option tcp-check
-    server master-1 192.168.5.11:6443 check fall 3 rise 2
-    server master-2 192.168.5.12:6443 check fall 3 rise 2
-EOF
-</code></pre>
-<pre><code>loadbalancer# sudo service haproxy restart
-</code></pre>
+<span class="sb">```</span>sh
+loadbalancer# cat <span class="s">&lt;&lt;EOF | sudo tee /etc/haproxy/haproxy.cfg </span>
+<span class="s">frontend kubernetes</span>
+<span class="s">    bind 192.168.5.30:6443</span>
+<span class="s">    option tcplog</span>
+<span class="s">    mode tcp</span>
+<span class="s">    default_backend kubernetes-master-nodes</span>
+
+<span class="s">backend kubernetes-master-nodes</span>
+<span class="s">    mode tcp</span>
+<span class="s">    balance roundrobin</span>
+<span class="s">    option tcp-check</span>
+<span class="s">    server master-1 192.168.5.11:6443 check fall 3 rise 2</span>
+<span class="s">    server master-2 192.168.5.12:6443 check fall 3 rise 2</span>
+<span class="s">EOF</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>loadbalancer# sudo service haproxy restart
+</code></pre></div>
 <h3 id="verification_1">Verification</h3>
 <p>Make a HTTP request for the Kubernetes version info:</p>
-<pre><code>curl  https://192.168.5.30:6443/version -k
-</code></pre>
+<div class="highlight"><pre><span></span><code>curl  https://192.168.5.30:6443/version -k
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>{
-  &quot;major&quot;: &quot;1&quot;,
-  &quot;minor&quot;: &quot;13&quot;,
-  &quot;gitVersion&quot;: &quot;v1.13.0&quot;,
-  &quot;gitCommit&quot;: &quot;ddf47ac13c1a9483ea035a79cd7c10005ff21a6d&quot;,
-  &quot;gitTreeState&quot;: &quot;clean&quot;,
-  &quot;buildDate&quot;: &quot;2018-12-03T20:56:12Z&quot;,
-  &quot;goVersion&quot;: &quot;go1.11.2&quot;,
-  &quot;compiler&quot;: &quot;gc&quot;,
-  &quot;platform&quot;: &quot;linux/amd64&quot;
-}
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="o">{</span>
+  <span class="s2">&quot;major&quot;</span>: <span class="s2">&quot;1&quot;</span>,
+  <span class="s2">&quot;minor&quot;</span>: <span class="s2">&quot;13&quot;</span>,
+  <span class="s2">&quot;gitVersion&quot;</span>: <span class="s2">&quot;v1.13.0&quot;</span>,
+  <span class="s2">&quot;gitCommit&quot;</span>: <span class="s2">&quot;ddf47ac13c1a9483ea035a79cd7c10005ff21a6d&quot;</span>,
+  <span class="s2">&quot;gitTreeState&quot;</span>: <span class="s2">&quot;clean&quot;</span>,
+  <span class="s2">&quot;buildDate&quot;</span>: <span class="s2">&quot;2018-12-03T20:56:12Z&quot;</span>,
+  <span class="s2">&quot;goVersion&quot;</span>: <span class="s2">&quot;go1.11.2&quot;</span>,
+  <span class="s2">&quot;compiler&quot;</span>: <span class="s2">&quot;gc&quot;</span>,
+  <span class="s2">&quot;platform&quot;</span>: <span class="s2">&quot;linux/amd64&quot;</span>
+<span class="o">}</span>
+</code></pre></div>
 <p>Next: <a href="../09-bootstrapping-kubernetes-workers/">Bootstrapping the Kubernetes Worker Nodes</a></p>
                 
               
@@ -1030,6 +1032,7 @@ EOF
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -1043,7 +1046,7 @@ EOF
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

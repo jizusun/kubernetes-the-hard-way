@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -751,22 +751,22 @@
 <h2 id="certificate-authority">Certificate Authority</h2>
 <p>In this section you will provision a Certificate Authority that can be used to generate additional TLS certificates.</p>
 <p>Create a CA certificate, then generate a Certificate Signing Request and use it to create a private key:</p>
-<pre><code># Create private key for CA
-openssl genrsa -out ca.key 2048
+<p><div class="highlight"><pre><span></span><code><span class="c1"># Create private key for CA</span>
+openssl genrsa -out ca.key <span class="m">2048</span>
 
-# Comment line starting with RANDFILE in /etc/ssl/openssl.cnf definition to avoid permission issues
-sudo sed -i '0,/RANDFILE/{s/RANDFILE/\#&amp;/}' /etc/ssl/openssl.cnf
+<span class="c1"># Comment line starting with RANDFILE in /etc/ssl/openssl.cnf definition to avoid permission issues</span>
+sudo sed -i <span class="s1">&#39;0,/RANDFILE/{s/RANDFILE/\#&amp;/}&#39;</span> /etc/ssl/openssl.cnf
 
-# Create CSR using the private key
-openssl req -new -key ca.key -subj &quot;/CN=KUBERNETES-CA&quot; -out ca.csr
+<span class="c1"># Create CSR using the private key</span>
+openssl req -new -key ca.key -subj <span class="s2">&quot;/CN=KUBERNETES-CA&quot;</span> -out ca.csr
 
-# Self sign the csr using its own private key
-openssl x509 -req -in ca.csr -signkey ca.key -CAcreateserial  -out ca.crt -days 1000
-</code></pre>
-<p>Results:</p>
-<pre><code>ca.crt
+<span class="c1"># Self sign the csr using its own private key</span>
+openssl x509 -req -in ca.csr -signkey ca.key -CAcreateserial  -out ca.crt -days <span class="m">1000</span>
+</code></pre></div>
+Results:</p>
+<div class="highlight"><pre><span></span><code>ca.crt
 ca.key
-</code></pre>
+</code></pre></div>
 <p>Reference : https://kubernetes.io/docs/concepts/cluster-administration/certificates/#openssl</p>
 <p>The ca.crt is the Kubernetes Certificate Authority certificate and ca.key is the Kubernetes Certificate Authority private key.
 You will use the ca.crt file in many places, so it will be copied to many places.
@@ -775,134 +775,134 @@ The ca.key is used by the CA for signing certificates. And it should be securely
 <p>In this section you will generate client and server certificates for each Kubernetes component and a client certificate for the Kubernetes <code>admin</code> user.</p>
 <h3 id="the-admin-client-certificate">The Admin Client Certificate</h3>
 <p>Generate the <code>admin</code> client certificate and private key:</p>
-<pre><code># Generate private key for admin user
-openssl genrsa -out admin.key 2048
+<div class="highlight"><pre><span></span><code><span class="c1"># Generate private key for admin user</span>
+openssl genrsa -out admin.key <span class="m">2048</span>
 
-# Generate CSR for admin user. Note the OU.
-openssl req -new -key admin.key -subj &quot;/CN=admin/O=system:masters&quot; -out admin.csr
+<span class="c1"># Generate CSR for admin user. Note the OU.</span>
+openssl req -new -key admin.key -subj <span class="s2">&quot;/CN=admin/O=system:masters&quot;</span> -out admin.csr
 
-# Sign certificate for admin user using CA servers private key
-openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out admin.crt -days 1000
-</code></pre>
+<span class="c1"># Sign certificate for admin user using CA servers private key</span>
+openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out admin.crt -days <span class="m">1000</span>
+</code></pre></div>
 <p>Note that the admin user is part of the <strong>system:masters</strong> group. This is how we are able to perform any administrative operations on Kubernetes cluster using kubectl utility.</p>
 <p>Results:</p>
-<pre><code>admin.key
+<div class="highlight"><pre><span></span><code>admin.key
 admin.crt
-</code></pre>
+</code></pre></div>
 <p>The admin.crt and admin.key file gives you administrative access. We will configure these to be used with the kubectl tool to perform administrative functions on kubernetes.</p>
 <h3 id="the-kubelet-client-certificates">The Kubelet Client Certificates</h3>
 <p>We are going to skip certificate configuration for Worker Nodes for now. We will deal with them when we configure the workers.
 For now let's just focus on the control plane components.</p>
 <h3 id="the-controller-manager-client-certificate">The Controller Manager Client Certificate</h3>
 <p>Generate the <code>kube-controller-manager</code> client certificate and private key:</p>
-<pre><code>openssl genrsa -out kube-controller-manager.key 2048
-openssl req -new -key kube-controller-manager.key -subj &quot;/CN=system:kube-controller-manager&quot; -out kube-controller-manager.csr
-openssl x509 -req -in kube-controller-manager.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out kube-controller-manager.crt -days 1000
-</code></pre>
+<div class="highlight"><pre><span></span><code>openssl genrsa -out kube-controller-manager.key <span class="m">2048</span>
+openssl req -new -key kube-controller-manager.key -subj <span class="s2">&quot;/CN=system:kube-controller-manager&quot;</span> -out kube-controller-manager.csr
+openssl x509 -req -in kube-controller-manager.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out kube-controller-manager.crt -days <span class="m">1000</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>kube-controller-manager.key
+<div class="highlight"><pre><span></span><code>kube-controller-manager.key
 kube-controller-manager.crt
-</code></pre>
+</code></pre></div>
 <h3 id="the-kube-proxy-client-certificate">The Kube Proxy Client Certificate</h3>
 <p>Generate the <code>kube-proxy</code> client certificate and private key:</p>
-<pre><code>openssl genrsa -out kube-proxy.key 2048
-openssl req -new -key kube-proxy.key -subj &quot;/CN=system:kube-proxy&quot; -out kube-proxy.csr
-openssl x509 -req -in kube-proxy.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out kube-proxy.crt -days 1000
-</code></pre>
+<div class="highlight"><pre><span></span><code>openssl genrsa -out kube-proxy.key <span class="m">2048</span>
+openssl req -new -key kube-proxy.key -subj <span class="s2">&quot;/CN=system:kube-proxy&quot;</span> -out kube-proxy.csr
+openssl x509 -req -in kube-proxy.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out kube-proxy.crt -days <span class="m">1000</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>kube-proxy.key
+<div class="highlight"><pre><span></span><code>kube-proxy.key
 kube-proxy.crt
-</code></pre>
+</code></pre></div>
 <h3 id="the-scheduler-client-certificate">The Scheduler Client Certificate</h3>
 <p>Generate the <code>kube-scheduler</code> client certificate and private key:</p>
-<pre><code>openssl genrsa -out kube-scheduler.key 2048
-openssl req -new -key kube-scheduler.key -subj &quot;/CN=system:kube-scheduler&quot; -out kube-scheduler.csr
-openssl x509 -req -in kube-scheduler.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out kube-scheduler.crt -days 1000
-</code></pre>
+<div class="highlight"><pre><span></span><code>openssl genrsa -out kube-scheduler.key <span class="m">2048</span>
+openssl req -new -key kube-scheduler.key -subj <span class="s2">&quot;/CN=system:kube-scheduler&quot;</span> -out kube-scheduler.csr
+openssl x509 -req -in kube-scheduler.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out kube-scheduler.crt -days <span class="m">1000</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>kube-scheduler.key
+<div class="highlight"><pre><span></span><code>kube-scheduler.key
 kube-scheduler.crt
-</code></pre>
+</code></pre></div>
 <h3 id="the-kubernetes-api-server-certificate">The Kubernetes API Server Certificate</h3>
 <p>The kube-apiserver certificate requires all names that various components may reach it to be part of the alternate names. These include the different DNS names, and IP addresses such as the master servers IP address, the load balancers IP address, the kube-api service IP address etc.</p>
 <p>The <code>openssl</code> command cannot take alternate names as command line parameter. So we must create a <code>conf</code> file for it:</p>
-<pre><code>cat &gt; openssl.cnf &lt;&lt;EOF
-[req]
-req_extensions = v3_req
-distinguished_name = req_distinguished_name
-[req_distinguished_name]
-[ v3_req ]
-basicConstraints = CA:FALSE
-keyUsage = nonRepudiation, digitalSignature, keyEncipherment
-subjectAltName = @alt_names
-[alt_names]
-DNS.1 = kubernetes
-DNS.2 = kubernetes.default
-DNS.3 = kubernetes.default.svc
-DNS.4 = kubernetes.default.svc.cluster.local
-IP.1 = 10.96.0.1
-IP.2 = 192.168.5.11
-IP.3 = 192.168.5.12
-IP.4 = 192.168.5.30
-IP.5 = 127.0.0.1
-EOF
-</code></pre>
+<div class="highlight"><pre><span></span><code>cat &gt; openssl.cnf <span class="s">&lt;&lt;EOF</span>
+<span class="s">[req]</span>
+<span class="s">req_extensions = v3_req</span>
+<span class="s">distinguished_name = req_distinguished_name</span>
+<span class="s">[req_distinguished_name]</span>
+<span class="s">[ v3_req ]</span>
+<span class="s">basicConstraints = CA:FALSE</span>
+<span class="s">keyUsage = nonRepudiation, digitalSignature, keyEncipherment</span>
+<span class="s">subjectAltName = @alt_names</span>
+<span class="s">[alt_names]</span>
+<span class="s">DNS.1 = kubernetes</span>
+<span class="s">DNS.2 = kubernetes.default</span>
+<span class="s">DNS.3 = kubernetes.default.svc</span>
+<span class="s">DNS.4 = kubernetes.default.svc.cluster.local</span>
+<span class="s">IP.1 = 10.96.0.1</span>
+<span class="s">IP.2 = 192.168.5.11</span>
+<span class="s">IP.3 = 192.168.5.12</span>
+<span class="s">IP.4 = 192.168.5.30</span>
+<span class="s">IP.5 = 127.0.0.1</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <p>Generates certs for kube-apiserver</p>
-<pre><code>openssl genrsa -out kube-apiserver.key 2048
-openssl req -new -key kube-apiserver.key -subj &quot;/CN=kube-apiserver&quot; -out kube-apiserver.csr -config openssl.cnf
-openssl x509 -req -in kube-apiserver.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out kube-apiserver.crt -extensions v3_req -extfile openssl.cnf -days 1000
-</code></pre>
+<div class="highlight"><pre><span></span><code>openssl genrsa -out kube-apiserver.key <span class="m">2048</span>
+openssl req -new -key kube-apiserver.key -subj <span class="s2">&quot;/CN=kube-apiserver&quot;</span> -out kube-apiserver.csr -config openssl.cnf
+openssl x509 -req -in kube-apiserver.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out kube-apiserver.crt -extensions v3_req -extfile openssl.cnf -days <span class="m">1000</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>kube-apiserver.crt
+<div class="highlight"><pre><span></span><code>kube-apiserver.crt
 kube-apiserver.key
-</code></pre>
+</code></pre></div>
 <h3 id="the-etcd-server-certificate">The ETCD Server Certificate</h3>
 <p>Similarly ETCD server certificate must have addresses of all the servers part of the ETCD cluster</p>
 <p>The <code>openssl</code> command cannot take alternate names as command line parameter. So we must create a <code>conf</code> file for it:</p>
-<pre><code>cat &gt; openssl-etcd.cnf &lt;&lt;EOF
-[req]
-req_extensions = v3_req
-distinguished_name = req_distinguished_name
-[req_distinguished_name]
-[ v3_req ]
-basicConstraints = CA:FALSE
-keyUsage = nonRepudiation, digitalSignature, keyEncipherment
-subjectAltName = @alt_names
-[alt_names]
-IP.1 = 192.168.5.11
-IP.2 = 192.168.5.12
-IP.3 = 127.0.0.1
-EOF
-</code></pre>
+<div class="highlight"><pre><span></span><code>cat &gt; openssl-etcd.cnf <span class="s">&lt;&lt;EOF</span>
+<span class="s">[req]</span>
+<span class="s">req_extensions = v3_req</span>
+<span class="s">distinguished_name = req_distinguished_name</span>
+<span class="s">[req_distinguished_name]</span>
+<span class="s">[ v3_req ]</span>
+<span class="s">basicConstraints = CA:FALSE</span>
+<span class="s">keyUsage = nonRepudiation, digitalSignature, keyEncipherment</span>
+<span class="s">subjectAltName = @alt_names</span>
+<span class="s">[alt_names]</span>
+<span class="s">IP.1 = 192.168.5.11</span>
+<span class="s">IP.2 = 192.168.5.12</span>
+<span class="s">IP.3 = 127.0.0.1</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <p>Generates certs for ETCD</p>
-<pre><code>openssl genrsa -out etcd-server.key 2048
-openssl req -new -key etcd-server.key -subj &quot;/CN=etcd-server&quot; -out etcd-server.csr -config openssl-etcd.cnf
-openssl x509 -req -in etcd-server.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out etcd-server.crt -extensions v3_req -extfile openssl-etcd.cnf -days 1000
-</code></pre>
+<div class="highlight"><pre><span></span><code>openssl genrsa -out etcd-server.key <span class="m">2048</span>
+openssl req -new -key etcd-server.key -subj <span class="s2">&quot;/CN=etcd-server&quot;</span> -out etcd-server.csr -config openssl-etcd.cnf
+openssl x509 -req -in etcd-server.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out etcd-server.crt -extensions v3_req -extfile openssl-etcd.cnf -days <span class="m">1000</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>etcd-server.key
+<div class="highlight"><pre><span></span><code>etcd-server.key
 etcd-server.crt
-</code></pre>
+</code></pre></div>
 <h2 id="the-service-account-key-pair">The Service Account Key Pair</h2>
 <p>The Kubernetes Controller Manager leverages a key pair to generate and sign service account tokens as describe in the <a href="https://kubernetes.io/docs/admin/service-accounts-admin/">managing service accounts</a> documentation.</p>
 <p>Generate the <code>service-account</code> certificate and private key:</p>
-<pre><code>openssl genrsa -out service-account.key 2048
-openssl req -new -key service-account.key -subj &quot;/CN=service-accounts&quot; -out service-account.csr
-openssl x509 -req -in service-account.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out service-account.crt -days 1000
-</code></pre>
+<div class="highlight"><pre><span></span><code>openssl genrsa -out service-account.key <span class="m">2048</span>
+openssl req -new -key service-account.key -subj <span class="s2">&quot;/CN=service-accounts&quot;</span> -out service-account.csr
+openssl x509 -req -in service-account.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -out service-account.crt -days <span class="m">1000</span>
+</code></pre></div>
 <p>Results:</p>
-<pre><code>service-account.key
+<div class="highlight"><pre><span></span><code>service-account.key
 service-account.crt
-</code></pre>
+</code></pre></div>
 <h2 id="distribute-the-certificates">Distribute the Certificates</h2>
 <p>Copy the appropriate certificates and private keys to each controller instance:</p>
-<pre><code>for instance in master-1 master-2; do
-  scp ca.crt ca.key kube-apiserver.key kube-apiserver.crt \
-    service-account.key service-account.crt \
-    etcd-server.key etcd-server.crt \
-    ${instance}:~/
-done
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> instance <span class="k">in</span> master-1 master-2<span class="p">;</span> <span class="k">do</span>
+  scp ca.crt ca.key kube-apiserver.key kube-apiserver.crt <span class="se">\</span>
+    service-account.key service-account.crt <span class="se">\</span>
+    etcd-server.key etcd-server.crt <span class="se">\</span>
+    <span class="si">${</span><span class="nv">instance</span><span class="si">}</span>:~/
+<span class="k">done</span>
+</code></pre></div>
 <blockquote>
 <p>The <code>kube-proxy</code>, <code>kube-controller-manager</code>, <code>kube-scheduler</code>, and <code>kubelet</code> client certificates will be used to generate client authentication configuration files in the next lab. These certificates will be embedded into the client authentication configuration files. We will then copy those configuration files to the other master nodes.</p>
 </blockquote>
@@ -963,6 +963,7 @@ done
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -976,7 +977,7 @@ done
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -639,33 +639,33 @@
 <code>$ssh-keygen</code></p>
 <p>Leave all settings to default.</p>
 <p>View the generated public key ID at:</p>
-<pre><code>$cat .ssh/id_rsa.pub
+<div class="highlight"><pre><span></span><code><span class="nv">$cat</span> .ssh/id_rsa.pub
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD......8+08b vagrant@master-1
-</code></pre>
+</code></pre></div>
 <p>Move public key of master to all other VMs</p>
-<pre><code>$cat &gt;&gt; ~/.ssh/authorized_keys &lt;&lt;EOF
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD......8+08b vagrant@master-1
-EOF
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nv">$cat</span> &gt;&gt; ~/.ssh/authorized_keys <span class="s">&lt;&lt;EOF</span>
+<span class="s">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD......8+08b vagrant@master-1</span>
+<span class="s">EOF</span>
+</code></pre></div>
 <h2 id="install-kubectl">Install kubectl</h2>
 <p>The <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl">kubectl</a>. command line utility is used to interact with the Kubernetes API Server. Download and install <code>kubectl</code> from the official release binaries:</p>
 <p>Reference: <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">https://kubernetes.io/docs/tasks/tools/install-kubectl/</a></p>
 <h3 id="linux">Linux</h3>
-<pre><code>wget https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl
-</code></pre>
-<pre><code>chmod +x kubectl
-</code></pre>
-<pre><code>sudo mv kubectl /usr/local/bin/
-</code></pre>
+<div class="highlight"><pre><span></span><code>wget https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>chmod +x kubectl
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>sudo mv kubectl /usr/local/bin/
+</code></pre></div>
 <h3 id="verification">Verification</h3>
 <p>Verify <code>kubectl</code> version 1.13.0 or higher is installed:</p>
-<pre><code>kubectl version --client
-</code></pre>
+<div class="highlight"><pre><span></span><code>kubectl version --client
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>Client Version: version.Info{Major:&quot;1&quot;, Minor:&quot;13&quot;, GitVersion:&quot;v1.13.0&quot;, GitCommit:&quot;ddf47ac13c1a9483ea035a79cd7c10005ff21a6d&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2018-12-03T21:04:45Z&quot;, GoVersion:&quot;go1.11.2&quot;, Compiler:&quot;gc&quot;, Platform:&quot;linux/amd64&quot;}
-</code></pre>
+<div class="highlight"><pre><span></span><code>Client Version: version.Info<span class="o">{</span>Major:<span class="s2">&quot;1&quot;</span>, Minor:<span class="s2">&quot;13&quot;</span>, GitVersion:<span class="s2">&quot;v1.13.0&quot;</span>, GitCommit:<span class="s2">&quot;ddf47ac13c1a9483ea035a79cd7c10005ff21a6d&quot;</span>, GitTreeState:<span class="s2">&quot;clean&quot;</span>, BuildDate:<span class="s2">&quot;2018-12-03T21:04:45Z&quot;</span>, GoVersion:<span class="s2">&quot;go1.11.2&quot;</span>, Compiler:<span class="s2">&quot;gc&quot;</span>, Platform:<span class="s2">&quot;linux/amd64&quot;</span><span class="o">}</span>
+</code></pre></div>
 <p>Next: <a href="../04-certificate-authority/">Certificate Authority</a></p>
                 
               
@@ -723,6 +723,7 @@ EOF
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -736,7 +737,7 @@ EOF
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>

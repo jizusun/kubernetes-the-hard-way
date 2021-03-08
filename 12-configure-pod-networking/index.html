@@ -10,7 +10,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
     
     
       
@@ -619,16 +619,19 @@
 <p>Weave uses POD CIDR of <code>10.32.0.0/12</code> by default.</p>
 <h2 id="verification">Verification</h2>
 <p>List the registered Kubernetes nodes from the master node:</p>
-<pre><code>master-1$ kubectl get pods -n kube-system
-</code></pre>
+<div class="highlight"><pre><span></span><code>master-1$ kubectl get pods -n kube-system
+</code></pre></div>
 <blockquote>
 <p>output</p>
 </blockquote>
-<pre><code>NAME              READY   STATUS    RESTARTS   AGE
-weave-net-58j2j   2/2     Running   0          89s
-weave-net-rr5dk   2/2     Running   0          89s
-</code></pre>
-<p>Reference: https://kubernetes.io/docs/tasks/administer-cluster/network-policy-provider/weave-network-policy/#install-the-weave-net-addon</p>
+<div class="highlight"><pre><span></span><code>NAME              READY   STATUS    RESTARTS   AGE
+weave-net-58j2j   <span class="m">2</span>/2     Running   <span class="m">0</span>          89s
+weave-net-rr5dk   <span class="m">2</span>/2     Running   <span class="m">0</span>          89s
+</code></pre></div>
+<p>Reference: </p>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/administer-cluster/network-policy-provider/weave-network-policy/#install-the-weave-net-addon">https://kubernetes.io/docs/tasks/administer-cluster/network-policy-provider/weave-network-policy/#install-the-weave-net-addon</a></li>
+</ul>
 <p>Next: <a href="../13-kube-apiserver-to-kubelet/">Kube API Server to Kubelet Connectivity</a></p>
                 
               
@@ -686,6 +689,7 @@ weave-net-rr5dk   2/2     Running   0          89s
         <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs
         </a>
+        
       </div>
       
     </div>
@@ -699,7 +703,7 @@ weave-net-rr5dk   2/2     Running   0          89s
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.9b151c6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
       
     
   </body>
