@@ -4,7 +4,7 @@
 
 Reference: https://github.com/etcd-io/etcd/releases
 
-```
+```sh
 ETCD_VER=v3.4.9
 
 # choose either URL
@@ -27,7 +27,7 @@ mv /tmp/etcd-download-test/etcdctl /usr/bin
 
 # 2. Backup
 
-```
+```sh
 ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt \
      --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key \
      snapshot save /opt/snapshot-pre-boot.db
@@ -45,7 +45,7 @@ If you want to take a backup of the ETCD service running on a different machine,
 
 # 3. Restore ETCD Snapshot to a new folder
 
-```
+```sh
 ETCDCTL_API=3 etcdctl  --data-dir /var/lib/etcd-from-backup \
      snapshot restore /opt/snapshot-pre-boot.db
 ```
@@ -55,7 +55,7 @@ As a result, the only required option for the restore command is the **--data-di
 # 4. Modify /etc/kubernetes/manifests/etcd.yaml
 Update --data-dir to use new target location
 
-```
+```sh
 --data-dir=/var/lib/etcd-from-backup
 ```
 
@@ -64,7 +64,7 @@ Update ETCD POD to use the new hostPath directory `/var/lib/etcd-from-backup` by
 
 Update volumes and volume mounts to point to new path
 
-```
+```sh
   volumes:
   - hostPath:
       path: /var/lib/etcd-from-backup

@@ -27,18 +27,20 @@ Weave uses POD CIDR of `10.32.0.0/12` by default.
 
 List the registered Kubernetes nodes from the master node:
 
-```
+```sh
 master-1$ kubectl get pods -n kube-system
 ```
 
 > output
 
-```
+```sh
 NAME              READY   STATUS    RESTARTS   AGE
 weave-net-58j2j   2/2     Running   0          89s
 weave-net-rr5dk   2/2     Running   0          89s
 ```
 
-Reference: https://kubernetes.io/docs/tasks/administer-cluster/network-policy-provider/weave-network-policy/#install-the-weave-net-addon
+Reference: 
+
+- <https://kubernetes.io/docs/tasks/administer-cluster/network-policy-provider/weave-network-policy/#install-the-weave-net-addon>
 
 Next: [Kube API Server to Kubelet Connectivity](13-kube-apiserver-to-kubelet.md)

@@ -10,7 +10,7 @@ Each kubeconfig requires a Kubernetes API Server to connect to. To support high 
 
 Generate a kubeconfig file suitable for authenticating as the `admin` user:
 
-```
+```sh
 {
   KUBERNETES_LB_ADDRESS=192.168.5.30
 
@@ -37,13 +37,13 @@ Reference doc for kubectl config [here](https://kubernetes.io/docs/tasks/access-
 
 Check the health of the remote Kubernetes cluster:
 
-```
+```sh
 kubectl get componentstatuses
 ```
 
 > output
 
-```
+```sh
 NAME                 STATUS    MESSAGE             ERROR
 controller-manager   Healthy   ok
 scheduler            Healthy   ok
@@ -53,13 +53,13 @@ etcd-0               Healthy   {"health":"true"}
 
 List the nodes in the remote Kubernetes cluster:
 
-```
+```sh
 kubectl get nodes
 ```
 
 > output
 
-```
+```sh
 NAME       STATUS   ROLES    AGE    VERSION
 worker-1   NotReady    <none>   118s   v1.13.0
 worker-2   NotReady    <none>   118s   v1.13.0

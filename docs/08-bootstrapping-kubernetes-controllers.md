@@ -14,7 +14,7 @@ The commands in this lab must be run on each controller instance: `master-1`, an
 
 Create the Kubernetes configuration directory:
 
-```
+```sh
 sudo mkdir -p /etc/kubernetes/config
 ```
 
@@ -22,7 +22,7 @@ sudo mkdir -p /etc/kubernetes/config
 
 Download the official Kubernetes release binaries:
 
-```
+```sh
 wget -q --show-progress --https-only --timestamping \
   "https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-apiserver" \
   "https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-controller-manager" \
@@ -34,7 +34,7 @@ Reference: https://kubernetes.io/docs/setup/release/#server-binaries
 
 Install the Kubernetes binaries:
 
-```
+```sh
 {
   chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
   sudo mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
@@ -43,7 +43,7 @@ Install the Kubernetes binaries:
 
 ### Configure the Kubernetes API Server
 
-```
+```sh
 {
   sudo mkdir -p /var/lib/kubernetes/
 
@@ -56,19 +56,19 @@ Install the Kubernetes binaries:
 
 The instance internal IP address will be used to advertise the API Server to members of the cluster. Retrieve the internal IP address for the current compute instance:
 
-```
+```sh
 INTERNAL_IP=$(ip addr show enp0s8 | grep "inet " | awk '{print $2}' | cut -d / -f 1)
 ```
 
 Verify it is set
 
-```
+```sh
 echo $INTERNAL_IP
 ```
 
 Create the `kube-apiserver.service` systemd unit file:
 
-```
+```sh
 cat <<EOF | sudo tee /etc/systemd/system/kube-apiserver.service
 [Unit]
 Description=Kubernetes API Server
@@ -118,13 +118,13 @@ EOF
 
 Copy the `kube-controller-manager` kubeconfig into place:
 
-```
+```sh
 sudo cp kube-controller-manager.kubeconfig /var/lib/kubernetes/
 ```
 
 Create the `kube-controller-manager.service` systemd unit file:
 
-```
+```sh
 cat <<EOF | sudo tee /etc/systemd/system/kube-controller-manager.service
 [Unit]
 Description=Kubernetes Controller Manager
@@ -156,13 +156,13 @@ EOF
 
 Copy the `kube-scheduler` kubeconfig into place:
 
-```
+```sh
 sudo cp kube-scheduler.kubeconfig /var/lib/kubernetes/
 ```
 
 Create the `kube-scheduler.service` systemd unit file:
 
-```
+```sh
 cat <<EOF | sudo tee /etc/systemd/system/kube-scheduler.service
 [Unit]
 Description=Kubernetes Scheduler
@@ -184,7 +184,7 @@ EOF
 
 ### Start the Controller Services
 
-```
+```sh
 {
   sudo systemctl daemon-reload
   sudo systemctl enable kube-apiserver kube-controller-manager kube-scheduler
@@ -197,11 +197,11 @@ EOF
 
 ### Verification
 
-```
+```sh
 kubectl get componentstatuses --kubeconfig admin.kubeconfig
 ```
 
-```
+```sh
 NAME                 STATUS    MESSAGE              ERROR
 controller-manager   Healthy   ok
 scheduler            Healthy   ok
@@ -220,13 +220,13 @@ In this section you will provision an external load balancer to front the Kubern
 
 Login to `loadbalancer` instance using SSH Terminal.
 
-```
+```sh
 #Install HAProxy
 loadbalancer# sudo apt-get update && sudo apt-get install -y haproxy
 
-```
+```sh
 
-```
+```sh
 loadbalancer# cat <<EOF | sudo tee /etc/haproxy/haproxy.cfg 
 frontend kubernetes
     bind 192.168.5.30:6443
@@ -243,7 +243,7 @@ backend kubernetes-master-nodes
 EOF
 ```
 
-```
+```sh
 loadbalancer# sudo service haproxy restart
 ```
 
@@ -251,13 +251,13 @@ loadbalancer# sudo service haproxy restart
 
 Make a HTTP request for the Kubernetes version info:
 
-```
+```sh
 curl  https://192.168.5.30:6443/version -k
 ```
 
 > output
 
-```
+```sh
 {
   "major": "1",
   "minor": "13",

@@ -2,7 +2,7 @@
 
 This is the solution to the practice test on TLS Bootstrapping hosted [here](https://kodekloud.com/courses/certified-kubernetes-administrator-with-practice-tests/lectures/9833234)
 
-```
+```sh
 cat > bootstrap-token-09426c.yaml <<EOF
 apiVersion: v1
 kind: Secret
@@ -37,13 +37,13 @@ EOF
 
 ## Create Cluster Role Binding
 
-```
+```sh
 kubectl create clusterrolebinding crb-to-create-csr --clusterrole=system:node-bootstrapper --group=system:bootstrappers
 ```
 
 --------------- OR ---------------
 
-```
+```sh
 cat > crb-to-create-csr <<-EOF
 # enable bootstrapping nodes to create CSR
 kind: ClusterRoleBinding
@@ -66,13 +66,13 @@ EOF
 
 # Authorize workers(kubelets) to approve CSR
 
-```
+```sh
 kubectl create clusterrolebinding crb-to-approve-csr --clusterrole=system:certificates.k8s.io:certificatesigningrequests:nodeclient --group=system:bootstrappers
 ```
 
 --------------- OR ---------------
 
-```
+```sh
 cat > crb-to-approve-csr.yaml <<EOF
 # Approve all CSRs for the group "system:bootstrappers"
 kind: ClusterRoleBinding
@@ -95,13 +95,13 @@ EOF
 
 # Auto rotate/renew certificates
 
-```
+```sh
 kubectl create clusterrolebinding crb-autorenew-csr-for-nodes --clusterrole=system:certificates.k8s.io:certificatesigningrequests:selfnodeclient --group=system:nodes
 ```
 
 --------------- OR ---------------
 
-```
+```sh
 cat > auto-approve-renewals-for-nodes.yaml <<EOF
 # Approve renewal CSRs for the group "system:nodes"
 kind: ClusterRoleBinding
@@ -131,7 +131,7 @@ kubectl cluster-info
 ```
 Create the kubeconfig file:
 
-```
+```sh
 kubectl config --kubeconfig=/tmp/bootstrap-kubeconfig set-cluster bootstrap --server='https://<replace kube-apiserver IP>:6443' --certificate-authority=/etc/kubernetes/pki/ca.crt
 kubectl config --kubeconfig=/tmp/bootstrap-kubeconfig set-credentials kubelet-bootstrap --token=09426c.g262dkeidk3dx21x
 kubectl config --kubeconfig=/tmp/bootstrap-kubeconfig set-context bootstrap --user=kubelet-bootstrap --cluster=bootstrap
@@ -143,7 +143,7 @@ kubectl config --kubeconfig=/tmp/bootstrap-kubeconfig use-context bootstrap
 
 Create new service file
 
-```
+```sh
 cat > /etc/systemd/system/kubelet.service <<-EOF
 [Unit]
 Description=Kubernetes Kubelet
@@ -169,14 +169,14 @@ EOF
 
 Reload service and start kubelet
 
-```
+```sh
 node03$ systemctl daemon-reload
 node03$ service kubelet start
 ```
 
 Verify node has joined the cluster
 
-```
+```sh
 master$ kubectl get nodes
 
-```
+```sh

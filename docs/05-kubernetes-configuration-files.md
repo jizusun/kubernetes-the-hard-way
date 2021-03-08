@@ -10,7 +10,7 @@ In this section you will generate kubeconfig files for the `controller manager`,
 
 Each kubeconfig requires a Kubernetes API Server to connect to. To support high availability the IP address assigned to the load balancer will be used. In our case it is `192.168.5.30`
 
-```
+```sh
 LOADBALANCER_ADDRESS=192.168.5.30
 ```
 
@@ -18,7 +18,7 @@ LOADBALANCER_ADDRESS=192.168.5.30
 
 Generate a kubeconfig file for the `kube-proxy` service:
 
-```
+```sh
 {
   kubectl config set-cluster kubernetes-the-hard-way \
     --certificate-authority=ca.crt \
@@ -43,7 +43,7 @@ Generate a kubeconfig file for the `kube-proxy` service:
 
 Results:
 
-```
+```sh
 kube-proxy.kubeconfig
 ```
 
@@ -53,7 +53,7 @@ Reference docs for kube-proxy [here](https://kubernetes.io/docs/reference/comman
 
 Generate a kubeconfig file for the `kube-controller-manager` service:
 
-```
+```sh
 {
   kubectl config set-cluster kubernetes-the-hard-way \
     --certificate-authority=ca.crt \
@@ -78,7 +78,7 @@ Generate a kubeconfig file for the `kube-controller-manager` service:
 
 Results:
 
-```
+```sh
 kube-controller-manager.kubeconfig
 ```
 
@@ -88,7 +88,7 @@ Reference docs for kube-controller-manager [here](https://kubernetes.io/docs/ref
 
 Generate a kubeconfig file for the `kube-scheduler` service:
 
-```
+```sh
 {
   kubectl config set-cluster kubernetes-the-hard-way \
     --certificate-authority=ca.crt \
@@ -113,7 +113,7 @@ Generate a kubeconfig file for the `kube-scheduler` service:
 
 Results:
 
-```
+```sh
 kube-scheduler.kubeconfig
 ```
 
@@ -123,7 +123,7 @@ Reference docs for kube-scheduler [here](https://kubernetes.io/docs/reference/co
 
 Generate a kubeconfig file for the `admin` user:
 
-```
+```sh
 {
   kubectl config set-cluster kubernetes-the-hard-way \
     --certificate-authority=ca.crt \
@@ -148,7 +148,7 @@ Generate a kubeconfig file for the `admin` user:
 
 Results:
 
-```
+```sh
 admin.kubeconfig
 ```
 
@@ -160,7 +160,7 @@ Reference docs for kubeconfig [here](https://kubernetes.io/docs/tasks/access-app
 
 Copy the appropriate `kube-proxy` kubeconfig files to each worker instance:
 
-```
+```sh
 for instance in worker-1 worker-2; do
   scp kube-proxy.kubeconfig ${instance}:~/
 done
@@ -168,7 +168,7 @@ done
 
 Copy the appropriate `admin.kubeconfig`, `kube-controller-manager` and `kube-scheduler` kubeconfig files to each controller instance:
 
-```
+```sh
 for instance in master-1 master-2; do
   scp admin.kubeconfig kube-controller-manager.kubeconfig kube-scheduler.kubeconfig ${instance}:~/
 done

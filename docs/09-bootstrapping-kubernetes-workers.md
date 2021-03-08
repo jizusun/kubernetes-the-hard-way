@@ -3,6 +3,7 @@
 In this lab you will bootstrap 2 Kubernetes worker nodes. We already have [Docker](https://www.docker.com) installed on these nodes.
 
 We will now install the kubernetes components
+
 - [kubelet](https://kubernetes.io/docs/admin/kubelet)
 - [kube-proxy](https://kubernetes.io/docs/concepts/cluster-administration/proxies).
 
@@ -19,7 +20,7 @@ Generate a certificate and private key for one worker node:
 
 On master-1:
 
-```
+```sh
 master-1$ cat > openssl-worker-1.cnf <<EOF
 [req]
 req_extensions = v3_req
@@ -41,7 +42,7 @@ openssl x509 -req -in worker-1.csr -CA ca.crt -CAkey ca.key -CAcreateserial  -ou
 
 Results:
 
-```
+```sh
 worker-1.key
 worker-1.crt
 ```
@@ -83,7 +84,7 @@ On master-1:
 
 Results:
 
-```
+```sh
 worker-1.kubeconfig
 ```
 
@@ -109,7 +110,7 @@ Reference: https://kubernetes.io/docs/setup/release/#node-binaries
 
 Create the installation directories:
 
-```
+```sh
 worker-1$ sudo mkdir -p \
   /etc/cni/net.d \
   /opt/cni/bin \
@@ -121,7 +122,7 @@ worker-1$ sudo mkdir -p \
 
 Install the worker binaries:
 
-```
+```sh
 {
   chmod +x kubectl kube-proxy kubelet
   sudo mv kubectl kube-proxy kubelet /usr/local/bin/
@@ -140,7 +141,7 @@ On worker-1:
 
 Create the `kubelet-config.yaml` configuration file:
 
-```
+```sh
 worker-1$ cat <<EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -165,7 +166,7 @@ EOF
 
 Create the `kubelet.service` systemd unit file:
 
-```
+```sh
 worker-1$ cat <<EOF | sudo tee /etc/systemd/system/kubelet.service
 [Unit]
 Description=Kubernetes Kubelet
@@ -199,7 +200,7 @@ worker-1$ sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
 
 Create the `kube-proxy-config.yaml` configuration file:
 
-```
+```sh
 worker-1$ cat <<EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml
 kind: KubeProxyConfiguration
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
@@ -212,7 +213,7 @@ EOF
 
 Create the `kube-proxy.service` systemd unit file:
 
-```
+```sh
 worker-1$ cat <<EOF | sudo tee /etc/systemd/system/kube-proxy.service
 [Unit]
 Description=Kubernetes Kube Proxy
@@ -246,13 +247,13 @@ On master-1:
 
 List the registered Kubernetes nodes from the master node:
 
-```
+```sh
 master-1$ kubectl get nodes --kubeconfig admin.kubeconfig
 ```
 
 > output
 
-```
+```sh
 NAME       STATUS     ROLES    AGE   VERSION
 worker-1   NotReady   <none>   93s   v1.13.0
 ```
