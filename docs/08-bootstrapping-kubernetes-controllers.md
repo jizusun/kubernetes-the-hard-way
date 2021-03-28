@@ -223,8 +223,7 @@ Login to `loadbalancer` instance using SSH Terminal.
 ```sh
 #Install HAProxy
 loadbalancer# sudo apt-get update && sudo apt-get install -y haproxy
-
-```sh
+```
 
 ```sh
 loadbalancer# cat <<EOF | sudo tee /etc/haproxy/haproxy.cfg 
