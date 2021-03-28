@@ -711,7 +711,7 @@ Once this is done, the commands are to be run on first worker instance: <code>wo
 <p>Kubernetes uses a <a href="https://kubernetes.io/docs/admin/authorization/node/">special-purpose authorization mode</a> called Node Authorizer, that specifically authorizes API requests made by <a href="https://kubernetes.io/docs/concepts/overview/components/#kubelet">Kubelets</a>. In order to be authorized by the Node Authorizer, Kubelets must use a credential that identifies them as being in the <code>system:nodes</code> group, with a username of <code>system:node:&lt;nodeName&gt;</code>. In this section you will create a certificate for each Kubernetes worker node that meets the Node Authorizer requirements.</p>
 <p>Generate a certificate and private key for one worker node:</p>
 <p>On master-1:</p>
-<div class="highlight"><pre><span></span><code>master-1$ cat &gt; openssl-worker-1.cnf <span class="s">&lt;&lt;EOF</span>
+<div class="highlight"><pre><span></span><code>cat &gt; openssl-worker-1.cnf <span class="s">&lt;&lt;EOF</span>
 <span class="s">[req]</span>
 <span class="s">req_extensions = v3_req</span>
 <span class="s">distinguished_name = req_distinguished_name</span>
@@ -766,19 +766,19 @@ worker-1.crt
 </code></pre></div>
 <h3 id="copy-certificates-private-keys-and-kubeconfig-files-to-the-worker-node">Copy certificates, private keys and kubeconfig files to the worker node:</h3>
 <p>On master-1:
-<div class="highlight"><pre><span></span><code>master-1$ scp ca.crt worker-1.crt worker-1.key worker-1.kubeconfig worker-1:~/
+<div class="highlight"><pre><span></span><code>scp ca.crt worker-1.crt worker-1.key worker-1.kubeconfig worker-1:~/
 </code></pre></div></p>
 <h3 id="download-and-install-worker-binaries">Download and Install Worker Binaries</h3>
 <p>Going forward all activities are to be done on the <code>worker-1</code> node.</p>
 <p>On worker-1:
-<div class="highlight"><pre><span></span><code>worker-1$ wget -q --show-progress --https-only --timestamping \
+<div class="highlight"><pre><span></span><code>wget -q --show-progress --https-only --timestamping \
   https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl \
   https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-proxy \
   https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubelet
 </code></pre></div></p>
 <p>Reference: https://kubernetes.io/docs/setup/release/#node-binaries</p>
 <p>Create the installation directories:</p>
-<div class="highlight"><pre><span></span><code>worker-1$ sudo mkdir -p <span class="se">\</span>
+<div class="highlight"><pre><span></span><code>sudo mkdir -p <span class="se">\</span>
   /etc/cni/net.d <span class="se">\</span>
   /opt/cni/bin <span class="se">\</span>
   /var/lib/kubelet <span class="se">\</span>
@@ -801,7 +801,7 @@ worker-1.crt
 }
 </code></pre></div></p>
 <p>Create the <code>kubelet-config.yaml</code> configuration file:</p>
-<div class="highlight"><pre><span></span><code>worker-1$ cat <span class="s">&lt;&lt;EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml</span>
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml</span>
 <span class="s">kind: KubeletConfiguration</span>
 <span class="s">apiVersion: kubelet.config.k8s.io/v1beta1</span>
 <span class="s">authentication:</span>
@@ -824,7 +824,7 @@ worker-1.crt
 <p>The <code>resolvConf</code> configuration is used to avoid loops when using CoreDNS for service discovery on systems running <code>systemd-resolved</code>.</p>
 </blockquote>
 <p>Create the <code>kubelet.service</code> systemd unit file:</p>
-<div class="highlight"><pre><span></span><code>worker-1$ cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kubelet.service</span>
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kubelet.service</span>
 <span class="s">[Unit]</span>
 <span class="s">Description=Kubernetes Kubelet</span>
 <span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
@@ -850,10 +850,10 @@ worker-1.crt
 </code></pre></div>
 <h3 id="configure-the-kubernetes-proxy">Configure the Kubernetes Proxy</h3>
 <p>On worker-1:
-<div class="highlight"><pre><span></span><code>worker-1$ sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
+<div class="highlight"><pre><span></span><code>sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
 </code></pre></div></p>
 <p>Create the <code>kube-proxy-config.yaml</code> configuration file:</p>
-<div class="highlight"><pre><span></span><code>worker-1$ cat <span class="s">&lt;&lt;EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml</span>
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml</span>
 <span class="s">kind: KubeProxyConfiguration</span>
 <span class="s">apiVersion: kubeproxy.config.k8s.io/v1alpha1</span>
 <span class="s">clientConnection:</span>
@@ -863,7 +863,7 @@ worker-1.crt
 <span class="s">EOF</span>
 </code></pre></div>
 <p>Create the <code>kube-proxy.service</code> systemd unit file:</p>
-<div class="highlight"><pre><span></span><code>worker-1$ cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kube-proxy.service</span>
+<div class="highlight"><pre><span></span><code>cat <span class="s">&lt;&lt;EOF | sudo tee /etc/systemd/system/kube-proxy.service</span>
 <span class="s">[Unit]</span>
 <span class="s">Description=Kubernetes Kube Proxy</span>
 <span class="s">Documentation=https://github.com/kubernetes/kubernetes</span>
@@ -892,7 +892,7 @@ worker-1.crt
 <h2 id="verification">Verification</h2>
 <p>On master-1:</p>
 <p>List the registered Kubernetes nodes from the master node:</p>
-<div class="highlight"><pre><span></span><code>master-1$ kubectl get nodes --kubeconfig admin.kubeconfig
+<div class="highlight"><pre><span></span><code>kubectl get nodes --kubeconfig admin.kubeconfig
 </code></pre></div>
 <blockquote>
 <p>output</p>
