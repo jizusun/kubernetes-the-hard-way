@@ -61,8 +61,9 @@ Update --data-dir to use new target location
 
 Update ETCD POD to use the new hostPath directory `/var/lib/etcd-from-backup` by modifying the pod definition file at `/etc/kubernetes/manifests/etcd.yaml`. When this file is updated, the ETCD pod is automatically re-created as this is a static pod placed under the `/etc/kubernetes/manifests` directory.
 
+# 4. Modify /etc/kubernetes/manifests/etcd.yaml
 
-Update volumes and volume mounts to point to new path
+We have now restored the etcd snapshot  to a new path on the controlplane - **/var/lib/etcd-from-backup**, so, the only change to be made in the YAML file, is to change the hostPath for the volume called **etcd-data** from old directory (/var/lib/etcd) to the new directory **/var/lib/etcd-from-backup**.
 
 ```sh
   volumes:
@@ -70,12 +71,17 @@ Update volumes and volume mounts to point to new path
       path: /var/lib/etcd-from-backup
       type: DirectoryOrCreate
     name: etcd-data
-  - hostPath:
-      path: /etc/kubernetes/pki/etcd
-      type: DirectoryOrCreate
-    name: etcd-certs
 ```
+With this change, /var/lib/etcd on the **container** points to /var/lib/etcd-from-backup on the **controlplane** (which is what we want)
+
+
+When this file is updated, the ETCD pod is automatically re-created as this is a static pod placed under the `/etc/kubernetes/manifests` directory.
+
 
 > Note: as the ETCD pod has changed it will automatically restart, and also kube-controller-manager and kube-scheduler. Wait 1-2 to mins for this pods to restart. You can make a `watch "docker ps | grep etcd"` to see when the ETCD pod is restarted.
 
 > Note2: If the etcd pod is not getting `Ready 1/1`, then restart it by `kubectl delete pod -n kube-system etcd-controlplane` and wait 1 minute.
+
+> Note3: This is the simplest way to make sure that ETCD uses the restored data after the ETCD pod is recreated. You **don't** have to change anything else.
+  
+  **If** you do change **--data-dir** to **/var/lib/etcd-from-backup** in the YAML file, make sure that the **volumeMounts** for **etcd-data** is updated as well, with the mountPath pointing to /var/lib/etcd-from-backup (**THIS COMPLETE STEP IS OPTIONAL AND NEED NOT BE DONE FOR COMPLETING THE RESTORE**)
